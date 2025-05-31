@@ -278,7 +278,11 @@
   </style>
 </head>
 <body>
-  <h1>バトオペ2 カスタムパーツ仮組みツール</h1>
+<h1>バトオペ2 カスタムパーツ仮組みツール
+  <button id="info-btn" style="margin-left: 16px; padding: 8px 16px; font-size: 14px; background: #448aff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+    使い方・情報
+  </button>
+</h1>
 
   <div class="main-container">
     <!-- 左パネル：カスタムパーツ一覧 -->
@@ -607,6 +611,47 @@
       </div>
     </div>
   </div>
+
+<!-- 情報表示モーダル -->
+<div id="info-modal" class="modal">
+  <div class="modal-content" style="width: 600px; max-height: 80vh; overflow-y: auto;">
+    <span class="close" id="info-modal-close">&times;</span>
+    <div class="modal-header">
+      <h3>バトオペ2 カスタムパーツ仮組みツール 使い方</h3>
+    </div>
+    <div class="modal-body" style="text-align: left; line-height: 1.6;">
+      
+      <h4>操作方法</h4>
+      <ul>
+        <li><strong>パーツ装備</strong>：パーツをクリックで詳細表示、ダブルクリックで装備</li>
+        <li><strong>パーツ解除</strong>：装備中パーツをクリックで解除</li>
+        <li><strong>未所有設定</strong>：パーツ詳細画面で「未所有」ボタンをクリック　未所持パーツは自動装備されなくなります。未所持設定は保存されます。</li>
+        <li>パーツ詳細は画面のどこをクリックしても閉じられます。</li>
+      </ul>
+      
+      <h4>火力指数・耐久指数</h4>
+      <p><strong>火力指数</strong>：射撃・格闘の与ダメージ割合を設定して計算されます</p>
+      <p><strong>耐久指数</strong>：実弾・ビーム・格闘の被ダメージ割合を設定して計算されます</p>
+      <p>「最大化」ボタンで自動的に最適なパーツできます</p>
+
+      
+      <h4>保存・読み込み機能</h4>
+      <p>機体情報を保存して後で読み込むことができます。比較機能もあるよ</p>
+      
+
+      
+      <h4>更新履歴・その他</h4>
+      <p>最終更新: 2025年5月31日</p>
+      <p>不具合報告や要望は、XのDMまで@8LpdFhYmxHfrOV9</p>
+    </div>
+    <div class="modal-footer">
+      <button id="info-modal-ok" style="padding: 6px 16px; font-size: 16px; border-radius: 4px; border: none; background: #448aff; color: #fff; cursor: pointer;">
+        閉じる
+      </button>
+    </div>
+  </div>
+</div>
+
 
   <script>
     // ステータス上限値（基本値）
@@ -3572,6 +3617,28 @@ function setupBidirectionalEnterNavigation() {
 
 // 実行
 setupBidirectionalEnterNavigation();
+// 情報モーダルの制御
+function openInfoModal() {
+  document.getElementById('info-modal').style.display = 'block';
+}
+
+function closeInfoModal() {
+  document.getElementById('info-modal').style.display = 'none';
+}
+
+// イベントリスナーの設定
+document.getElementById('info-btn').addEventListener('click', openInfoModal);
+document.getElementById('info-modal-close').addEventListener('click', closeInfoModal);
+document.getElementById('info-modal-ok').addEventListener('click', closeInfoModal);
+
+// モーダル外クリックで閉じる
+window.addEventListener('click', function(event) {
+  const infoModal = document.getElementById('info-modal');
+  if (event.target === infoModal) {
+    closeInfoModal();
+  }
+});
+
   </script>
 </body>
 </html>
