@@ -623,6 +623,7 @@
       
       <h4>操作方法</h4>
       <ul>
+        <li>エンターキーで次の入力欄にいけます。シフト＋エンターで1つ戻る。</li>
         <li><strong>パーツ装備</strong>：パーツをクリックで詳細表示、ダブルクリックで装備</li>
         <li><strong>パーツ解除</strong>：装備中パーツをクリックで解除</li>
         <li><strong>未所有設定</strong>：パーツ詳細画面で「未所有」ボタンをクリック　未所持パーツは自動装備されなくなります。未所持設定は保存されます。</li>
@@ -632,8 +633,8 @@
       <h4>火力指数・耐久指数</h4>
       <p><strong>火力指数</strong>：射撃・格闘の与ダメージ割合を設定して計算されます</p>
       <p><strong>耐久指数</strong>：実弾・ビーム・格闘の被ダメージ割合を設定して計算されます</p>
-      <p>「最大化」ボタンで自動的に最適なパーツできます</p>
-
+      <p>「最大化」ボタンで自動的に最適なパーツを装備できます</p>
+　　　<p>※拡張装甲で空きスロットが多いと、計算にかなり時間がかかります。</p>
       
       <h4>保存・読み込み機能</h4>
       <p>機体情報を保存して後で読み込むことができます。比較機能もあるよ</p>
@@ -3579,7 +3580,8 @@ function setupBidirectionalEnterNavigation() {
     'base_hp', 'base_ballistic', 'base_beam', 'base_melee',
     'base_shooting', 'base_fighting', 'base_speed', 'base_dash',
     'base_thruster', 'base_turn', 'base_level',
-    'slot_short', 'slot_middle', 'slot_long'
+    'slot_short', 'slot_middle', 'slot_long',
+    'shooting_ratio','fighting_ratio','ballistic_ratio','beam_ratio','melee_ratio'
   ];
 
   allInputs.forEach((currentId, index) => {
