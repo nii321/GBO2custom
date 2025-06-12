@@ -493,6 +493,14 @@
           <button id="maximize-power-btn" style="margin-top: 8px; padding: 8px 16px; font-size: 14px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; width: 100%;">
             火力指数最大化
           </button>
+                  <!-- スラスター部分 -->
+        <div style="flex: 1;">
+
+          <button id="maximize-thruster-btn" style="margin-top: 8px; padding: 8px 16px; font-size: 14px; background: #FF9800; color: white; border: none; border-radius: 4px; cursor: pointer; width: 100%;">
+            スラスター最大化
+          </button>
+        </div>
+
         </div>
 
         <!-- 耐久指数部分 -->
@@ -2743,6 +2751,150 @@ function calculateDurabilityIndexFast(testEquipped) {
 
   return durabilityIndex;
 }
+// 軽量なスラスター計算関数
+function calculateThrusterFast(testEquipped) {
+  const getNum = id => Number(document.getElementById(id).value) || 0;
+  const base = {
+    thruster: getNum('base_thruster')
+  };
+
+  // 拡張スキル補正
+  let expansionBonus = { thruster: 0 };
+  if (selectedExpansionSkill && selectedExpansionSkill.bonus) {
+    for (const key in selectedExpansionSkill.bonus) {
+      expansionBonus[key] = selectedExpansionSkill.bonus[key] || 0;
+    }
+  }
+  if (selectedExpansionSkill && selectedExpansionSkill.category && selectedExpansionSkill.effect) {
+    const count = testEquipped.filter(part => part && part.category === selectedExpansionSkill.category).length;
+    for (const stat in selectedExpansionSkill.effect) {
+      expansionBonus[stat] = (expansionBonus[stat] || 0) + selectedExpansionSkill.effect[stat] * count;
+    }
+  }
+
+  // パーツ合計
+  let rawBonus = { thruster: 0 };
+  testEquipped.forEach(part => {
+    if (part) {
+      rawBonus.thruster += getPartEffect(part, 'thruster');
+    }
+  });
+
+  // 上限計算
+  function calculateLimit(stat) {
+    let limit = BASE_LIMITS[stat];
+    if (selectedExpansionSkill && selectedExpansionSkill.limit && selectedExpansionSkill.limit[stat]) {
+      limit = (limit || 0) + selectedExpansionSkill.limit[stat];
+    }
+    testEquipped.forEach(part => {
+      if (part && part.limitBonus && part.limitBonus[stat]) {
+        limit = (limit || 0) + part.limitBonus[stat];
+      }
+    });
+    return limit;
+  }
+
+  // 最終値計算
+  const limit = calculateLimit('thruster');
+  const baseWithExpansion = base.thruster + (expansionBonus.thruster || 0);
+  const bonus = getCappedBonus(baseWithExpansion, rawBonus.thruster, limit);
+  const total = Math.min(baseWithExpansion + bonus, limit || Infinity);
+
+  return total;
+}
+
+
+function maximizeThruster() {
+  const currentEquipped = [...equipped];
+  
+  const thrusterParts = customParts.filter(part => {
+    const isCustomThrusterSelected = selectedExpansionSkill && selectedExpansionSkill.key.startsWith('custom_thruster');
+    
+    // スラスターに影響するパーツを選択
+    const hasThrusterEffect = part.thruster || 
+      (part.enhanceEffects && Object.values(part.enhanceEffects).some(effects => effects.thruster));
+    
+    const isCustomThrusterPart = isCustomThrusterSelected && part.category === "specialparts";
+    
+    return (hasThrusterEffect || isCustomThrusterPart) && ownedParts[part.name];
+  });
+
+  const used = getUsedSlots();
+  const slotShort = Number(document.getElementById('slot_short').value) || 0;
+  const slotMiddle = Number(document.getElementById('slot_middle').value) || 0;
+  const slotLong = Number(document.getElementById('slot_long').value) || 0;
+
+  let bestCombination = [...currentEquipped];
+  let maxThruster = calculateThrusterFast(currentEquipped);
+  let minSlotUsage = Infinity;
+
+  function findBestCombination(currentParts, currentIndex, currentUsed, usedTypes, usedNames) {
+    const currentThruster = calculateThrusterFast(currentParts);
+    const currentSlotUsage = currentUsed.short + currentUsed.middle + currentUsed.long;
+    
+    if (currentThruster > maxThruster || 
+        (currentThruster === maxThruster && currentSlotUsage < minSlotUsage)) {
+      maxThruster = currentThruster;
+      minSlotUsage = currentSlotUsage;
+      bestCombination = [...currentParts];
+    }
+
+    if (currentParts.filter(p => p !== null).length < 8) {
+      for (let i = currentIndex; i < thrusterParts.length; i++) {
+        const part = thrusterParts[i];
+        
+        // 早期スキップ条件
+        if (currentUsed.short + part.slot.short > slotShort ||
+            currentUsed.middle + part.slot.middle > slotMiddle ||
+            currentUsed.long + part.slot.long > slotLong) {
+          continue;
+        }
+
+        if (part.type && usedTypes.has(part.type)) continue;
+        if (usedNames.has(part.name)) continue;
+
+        const newUsed = {
+          short: currentUsed.short + part.slot.short,
+          middle: currentUsed.middle + part.slot.middle,
+          long: currentUsed.long + part.slot.long
+        };
+        
+        const newParts = [...currentParts];
+        const emptyIndex = newParts.findIndex(p => p === null);
+        if (emptyIndex !== -1) {
+          newParts[emptyIndex] = part;
+          
+          const newTypes = new Set(usedTypes);
+          const newNames = new Set(usedNames);
+          if (part.type) newTypes.add(part.type);
+          newNames.add(part.name);
+          
+          findBestCombination(newParts, i + 1, newUsed, newTypes, newNames);
+        }
+      }
+    }
+  }
+
+  // 初期状態のtypeとnameを記録
+  const initialTypes = new Set();
+  const initialNames = new Set();
+  currentEquipped.forEach(part => {
+    if (part) {
+      if (part.type) initialTypes.add(part.type);
+      initialNames.add(part.name);
+    }
+  });
+
+  findBestCombination([...currentEquipped], 0, used, initialTypes, initialNames);
+
+  // 最適な組み合わせを適用
+  equipped = bestCombination;
+  renderEquipped();
+  renderPartsList();
+  updateStatus();
+}
+
+
 
 
     // 全て解除ボタンのイベントリスナーを設定
@@ -3097,6 +3249,8 @@ function maximizeDurabilityIndex() {
 
     // 耐久指数最大化ボタンのイベントリスナーを設定
     document.getElementById('maximize-durability-btn').addEventListener('click', maximizeDurabilityIndex);
+    // スラスター最大化ボタンのイベントリスナーを設定
+    document.getElementById('maximize-thruster-btn').addEventListener('click', maximizeThruster);
 
     // 被ダメ割合を設定する関数
     function setDamageRatio(ballistic, beam, melee) {
@@ -3634,6 +3788,7 @@ document.getElementById('info-btn').addEventListener('click', openInfoModal);
 document.getElementById('info-modal-close').addEventListener('click', closeInfoModal);
 document.getElementById('info-modal-ok').addEventListener('click', closeInfoModal);
 
+
 // モーダル外クリックで閉じる
 window.addEventListener('click', function(event) {
   const infoModal = document.getElementById('info-modal');
@@ -3641,6 +3796,10 @@ window.addEventListener('click', function(event) {
     closeInfoModal();
   }
 });
+
+  </script>
+</body>
+</html>
 
   </script>
 </body>
