@@ -2812,6 +2812,10 @@ function maximizeThruster() {
     
     // スラスターに影響するパーツを選択
     const hasThrusterEffect = part.thruster || 
+      (part.specialEffects && part.specialEffects.some(effect => 
+        effect.type === 'thruster_recovery' || effect.type === 'overheat'
+      )) ||
+      (part.levelEffects && part.levelEffects.base && part.levelEffects.base.thruster) ||
       (part.enhanceEffects && Object.values(part.enhanceEffects).some(effects => effects.thruster));
     
     const isCustomThrusterPart = isCustomThrusterSelected && part.category === "specialparts";
