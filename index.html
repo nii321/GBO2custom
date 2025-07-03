@@ -889,6 +889,17 @@
           { type: "burn_duration", value: 10, text: "焼夷効果の継続時間が%d%増加" }
         ], category: "attackparts"
       },
+      {
+        name: "レベリングシステム［格闘］",
+        type: "レベリングシステム",
+        slot: { short: 3, middle: 1, long: 2 },
+        levelEffects: {
+          base: { fighting: 8 },
+          perLevel: { fighting: 2 },
+          maxBonus: { fighting: 16 }
+        },
+        category: "attackparts", useAttackParts: true
+      },
 
       // 防御パーツ
       { name: "強化フレーム LV1",  hp: 200, slot: { short: 0, middle: 0, long: 1 }, category: "defparts", useDefParts: true },
