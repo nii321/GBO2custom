@@ -3173,7 +3173,20 @@ function maximizeDurabilityIndex() {
         return false;
       }
     }
-    
+        // カスタムパーツ拡張装甲が選択されている場合の追加条件
+    if (isCustomArmorSelected) {
+      // 補給パックが装備されているかをチェック
+      const hasSupplyPack = currentEquipped.some(equippedPart => 
+        equippedPart && equippedPart.name && equippedPart.name.includes("補給パック")
+      );
+      
+      if (hasSupplyPack) {
+        // 補給パックが装備されている場合、クイックローダーと補助ジェネレーターを除外
+        if (part.name.includes("クイックローダー") || part.name.includes("補助ジェネレーター")) {
+          return false;
+        }
+      }
+    }
     return (isBaseDefensePart || isCustomHpPart || isCustomArmorPart) && ownedParts[part.name];
   });
 
