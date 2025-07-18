@@ -890,6 +890,13 @@
         ], category: "attackparts"
       },
       {
+        name: "火器管制最適化システム",
+        slot: { short: 3, middle: 1, long: 5 },
+        shooting: 2,
+        specialEffect: "ビーム射撃兵装の集束時間を5%短縮し、更に敵へ与えるダメージを5%増加させる。(火力指数非対応)",
+        category: "attackparts"
+      },
+      {
         name: "レベリングシステム［格闘］",
         type: "レベリングシステム",
         slot: { short: 3, middle: 1, long: 2 },
@@ -1918,6 +1925,32 @@
         return;
       }
     }
+
+        // 火器管制最適化システムと AD-ASL, 高精度集束リングの同時装備制限
+        if (part.name === "火器管制最適化システム" && 
+            equipped.some(e => e && (e.name.includes("AD-ASL") || e.name.includes("高精度集束リング")))) {
+          if (!equipped.includes(part)) {
+            const btn = document.createElement('button');
+            btn.className = 'part-btn';
+            btn.textContent = part.name;
+            btn.disabled = true;
+            btn.title = "AD-ASL及び高精度集束リングと同時装備できません";
+            getCategoryList(part.category).appendChild(btn);
+            return;
+          }
+        }
+        if ((part.name.includes("AD-ASL") || part.name.includes("高精度集束リング")) && 
+            equipped.some(e => e && e.name === "火器管制最適化システム")) {
+          if (!equipped.includes(part)) {
+            const btn = document.createElement('button');
+            btn.className = 'part-btn';
+            btn.textContent = part.name;
+            btn.disabled = true;
+            btn.title = "火器管制最適化システムと同時装備できません";
+            getCategoryList(part.category).appendChild(btn);
+            return;
+          }
+        }
 
         const btn = document.createElement('button');
         btn.className = 'part-btn';
@@ -3186,6 +3219,18 @@ function maximizeDurabilityIndex() {
       if (hasSupplyPack) {
         // 補給パックが装備されている場合、クイックローダーと補助ジェネレーターを除外
         if (part.name.includes("クイックローダー") || part.name.includes("補助ジェネレーター")) {
+          return false;
+        }
+      }
+
+      // 火器管制最適化システムが装備されているかをチェック
+      const hasFireControlSystem = currentEquipped.some(equippedPart => 
+        equippedPart && equippedPart.name === "火器管制最適化システム"
+      );
+      
+      if (hasFireControlSystem) {
+        // 火器管制最適化システムが装備されている場合、AD-ASL及び高精度集束リングを除外
+        if (part.name.includes("AD-ASL") || part.name.includes("高精度集束リング")) {
           return false;
         }
       }
