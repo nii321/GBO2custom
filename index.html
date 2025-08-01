@@ -631,6 +631,7 @@
       
       <h4>操作方法</h4>
       <ul>
+        <li>まずは機体ステータスを入力してください。</li>
         <li>エンターキーで次の入力欄にいけます。シフト＋エンターで1つ戻る。</li>
         <li><strong>パーツ装備</strong>：パーツをクリックで詳細表示、ダブルクリックで装備</li>
         <li><strong>パーツ解除</strong>：装備中パーツをクリックで解除</li>
@@ -650,7 +651,7 @@
 
       
       <h4>更新履歴・その他</h4>
-      <p>最終更新: 2025年7月3日</p>
+      <p>最終更新: 2025年8月1日</p>
       <p>そのうちスマホ対応するかも</p>
       <p>不具合報告や要望は、XのDMまで@8LpdFhYmxHfrOV9</p>
     </div>
@@ -1758,6 +1759,17 @@
         specialEffects: [
           { type: "fighting_percent", value: 20, text: "格闘補正が%d%増加" }
         ]
+      },
+      {
+        name: "特殊強化装置［Type-β］",
+        slot: { short: 4, middle: 3, long: 2 },
+        hp: 1000,
+        type: "特殊強化装置",
+        category: "specialparts",
+        useAttackParts: true,
+        specialEffects: [
+          { type: "shooting_percent", value: 20, text: "射撃補正が%d%増加" }
+        ]
       },  
   {
     name: "カテゴリ特攻プログラム［支援］",
@@ -2306,6 +2318,7 @@
       };
       let hpPercentBonus = 0;  // HPの割合増加効果を保持する変数
       let fightingPercentBonus = 0; // 格闘補正の割合増加効果を保持する変数
+      let shootingPercentBonus = 0; // 射撃補正の割合増加効果を保持する変数
       equipped.forEach(part => {
         if (part) {
           rawBonus.hp += getPartEffect(part, 'hp');
@@ -2319,7 +2332,7 @@
           rawBonus.thruster += getPartEffect(part, 'thruster');
           rawBonus.turn += getPartEffect(part, 'turn');
 
-          // HPと格闘補正の割合増加効果を集計
+          // HPと格闘補正と射撃補正の割合増加効果を集計
           if (part.specialEffects) {
             part.specialEffects.forEach(effect => {
               if (effect.type === 'hp_percent') {
@@ -2327,6 +2340,9 @@
               }
               if (effect.type === 'fighting_percent') {
                 fightingPercentBonus += effect.value;
+              }
+              if (effect.type === 'shooting_percent') {
+                shootingPercentBonus += effect.value;
               }
             });
           }
@@ -2360,6 +2376,16 @@
           }
           // 格闘補正の上昇値に割合増加分を加算（小数点以下切り捨て）
           bonus.fighting += Math.floor((base.fighting + expansionBonus.fighting + rawBonus.fighting) * (fightingPercentBonus / 100));
+        }
+
+        // 射撃補正の場合、割合増加を適用し、再度上限チェック
+        if (stat === 'shooting' && shootingPercentBonus > 0) {
+          total.shooting = Math.floor(total.shooting * (1 + shootingPercentBonus / 100));
+          if (limit !== null && limit !== undefined) {
+            total.shooting = Math.min(total.shooting, limit);
+          }
+          // 射撃補正の上昇値に割合増加分を加算（小数点以下切り捨て）
+          bonus.shooting += Math.floor((base.shooting + expansionBonus.shooting + rawBonus.shooting) * (shootingPercentBonus / 100));
         }
       });
       // 上限なし
@@ -2516,7 +2542,7 @@
         // ダメージ増加効果とHP割合増加効果は個別に表示せず、合計値のみ表示
         if (type === 'shooting_damage' || type === 'shooting_damage_overtune' || type === 'shooting_damage_decrease' ||
             type === 'melee_damage' || type === 'melee_damage_overtune' || type === 'melee_damage_decrease' ||
-            type === 'hp_percent' || type === 'fighting_percent') {
+            type === 'hp_percent' || type === 'fighting_percent' || type === 'shooting_percent') {
           return;
         }
         const effectDiv = document.createElement('div');
@@ -2560,6 +2586,16 @@
           effectDiv.className = 'special-effect-item';
           effectDiv.innerHTML = `
             <div class="effect">格闘補正が${fightingPercentBonus}%増加</div>
+          `;
+          specialEffectsList.appendChild(effectDiv);
+      }
+
+      // 合計した射撃補正割合増加効果を表示
+      if (shootingPercentBonus > 0) {
+          const effectDiv = document.createElement('div');
+          effectDiv.className = 'special-effect-item';
+          effectDiv.innerHTML = `
+            <div class="effect">射撃補正が${shootingPercentBonus}%増加</div>
           `;
           specialEffectsList.appendChild(effectDiv);
       }
@@ -2984,6 +3020,7 @@ function calculatePowerIndexFast(testEquipped) {
   // パーツ合計
   let rawBonus = { shooting: 0, fighting: 0 };
   let fightingPercentBonus = 0;
+  let shootingPercentBonus = 0;
   testEquipped.forEach(part => {
     if (part) {
       rawBonus.shooting += getPartEffect(part, 'shooting');
@@ -2993,6 +3030,9 @@ function calculatePowerIndexFast(testEquipped) {
         part.specialEffects.forEach(effect => {
           if (effect.type === 'fighting_percent') {
             fightingPercentBonus += effect.value;
+          }
+          if (effect.type === 'shooting_percent') {
+            shootingPercentBonus += effect.value;
           }
         });
       }
@@ -3028,6 +3068,15 @@ function calculatePowerIndexFast(testEquipped) {
     total.fighting = Math.floor(total.fighting * (1 + fightingPercentBonus / 100));
     if (limit !== null && limit !== undefined) {
       total.fighting = Math.min(total.fighting, limit);
+    }
+  }
+
+  // 射撃補正の割合増加を適用
+  if (shootingPercentBonus > 0) {
+    const limit = calculateLimit('shooting');
+    total.shooting = Math.floor(total.shooting * (1 + shootingPercentBonus / 100));
+    if (limit !== null && limit !== undefined) {
+      total.shooting = Math.min(total.shooting, limit);
     }
   }
 
