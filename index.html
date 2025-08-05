@@ -2,6 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>バトオペ2 カスタムパーツ仮組みツール</title>
   <style>
     body { font-family: sans-serif; margin: 24px; }
@@ -212,17 +213,424 @@
     .left-panel {
       flex: 1;
       min-width: 300px;
+      order: 1;  /* PC用：左に表示 */
     }
 
     .right-panel {
       flex: 1;
       min-width: 300px;
       max-width: 600px;
+      order: 2;  /* PC用：右に表示 */
     }
 
     .bottom-panel {
       margin-top: 24px;
       width: 100%;
+    }
+
+    /* スマホ対応のメディアクエリ */
+    @media (max-width: 768px) {
+      body {
+        margin: 12px;
+        font-size: 14px;
+      }
+
+      /* メインコンテナを縦並びに */
+      .main-container {
+        display: block;
+        gap: 0;
+      }
+
+      .left-panel,
+      .right-panel {
+        width: 100%;
+        max-width: none;
+        min-width: auto;
+        margin-bottom: 16px;
+      }
+
+      /* スマホでの表示順序調整 */
+      .right-panel {
+        order: 1;  /* スマホ用：最初に表示（機体情報） */
+      }
+
+      .left-panel {
+        order: 2;  /* スマホ用：2番目に表示（カスタムパーツ一覧） */
+      }
+
+      .bottom-panel {
+        margin-top: 16px;
+      }
+
+      /* カスタムパーツ一覧を縦並びに */
+      .parts-list {
+        display: block;
+        gap: 4px;
+      }
+
+      .part-btn {
+        display: block;
+        width: 100%;
+        margin-bottom: 4px;
+        padding: 8px 12px;
+        text-align: left;
+        font-size: 14px;
+      }
+
+      /* カテゴリーセクションの調整 */
+      .category-section {
+        padding: 8px;
+        margin-bottom: 8px;
+      }
+
+      .category-section h3 {
+        font-size: 1em;
+        margin-bottom: 6px;
+        cursor: pointer;
+        position: relative;
+        padding-right: 20px;
+        user-select: none;
+      }
+
+      /* 折りたたみアイコン */
+      .category-section h3::after {
+        content: "▼";
+        position: absolute;
+        right: 0;
+        top: 0;
+        font-size: 0.8em;
+        transition: transform 0.2s ease;
+      }
+
+      .category-section.collapsed h3::after {
+        transform: rotate(-90deg);
+      }
+
+      /* 折りたたまれた状態のパーツリスト */
+      .category-section.collapsed .parts-list {
+        display: none;
+      }
+
+      /* 装備グリッドを縦1列に */
+      .equipped-grid {
+        display: block;
+        grid-template-columns: none;
+        grid-template-rows: none;
+        gap: 4px;
+      }
+
+      .slot {
+        width: 100%;
+        margin-bottom: 4px;
+        min-height: 32px;
+        font-size: 14px;
+      }
+
+      /* 機体情報テーブルの調整 */
+      table {
+        font-size: 14px;
+      }
+
+      th, td {
+        padding: 4px 6px;
+      }
+
+      /* セクションパディングの縮小 */
+      .status-section,
+      .equipped-section {
+        padding: 12px;
+        margin-bottom: 12px;
+      }
+
+      .status-section h2 {
+        font-size: 1.2em;
+        margin-bottom: 8px;
+      }
+
+      /* 拡張スキル・強化段階セクションの調整 */
+      .expansion-skill-select,
+      .enhance-stage-select {
+        padding: 6px;
+        margin: 8px 0;
+        font-size: 14px;
+      }
+
+      /* 拡張スキル選択の縦並び調整 */
+      .expansion-skill-row {
+        display: block;
+      }
+
+      .expansion-skill-row label {
+        display: block;
+        margin-bottom: 4px;
+        margin-left: 0 !important;
+      }
+
+      .expansion-skill-row select {
+        display: block;
+        width: 100%;
+        margin-bottom: 8px;
+      }
+
+      /* 強化段階選択の調整 */
+      .enhance-stage-select label {
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      .enhance-stage-select select {
+        display: block;
+        width: 100%;
+      }
+
+      /* スロット使用状況テーブルの調整 */
+      .slot-usage-table input[type="number"] {
+        width: 50px;
+      }
+
+      /* 火力指数・耐久指数計算セクションのスマホ対応 */
+      .damage-ratio-content {
+        display: block !important;
+        gap: 0 !important;
+      }
+
+      .power-section,
+      .durability-section,
+      .preset-section {
+        width: 100% !important;
+        flex: none !important;
+        margin-bottom: 16px;
+      }
+
+      /* 射撃与ダメ割合・格闘与ダメ割合 - 横並び（グリッド2列） */
+      .damage-input-grid {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 8px !important;
+        margin-bottom: 12px !important;
+      }
+
+      .damage-input-grid label {
+        display: block !important;
+        margin-right: 0 !important;
+        font-size: 14px !important;
+        text-align: center !important;
+      }
+
+      .damage-input-grid input {
+        width: 100% !important;
+        box-sizing: border-box !important;
+        margin-top: 4px !important;
+      }
+
+      /* 火力指数最大化（70%幅）とスラスター最大化（30%幅） - 横並び */
+      .power-buttons {
+        display: flex !important;
+        gap: 8px !important;
+        margin-top: 8px !important;
+      }
+
+      .power-buttons button:first-child {
+        flex: 0.7 !important;
+      }
+
+      .power-buttons button:last-child {
+        flex: 0.3 !important;
+      }
+
+      /* 実弾・ビーム・格闘被ダメ割合 - 横一列（グリッド3列、小さめフォント） */
+      .durability-input-grid {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr 1fr !important;
+        gap: 4px !important;
+        margin-bottom: 12px !important;
+      }
+
+      .durability-input-grid label {
+        display: block !important;
+        margin-right: 0 !important;
+        font-size: 12px !important;
+        text-align: center !important;
+      }
+
+      .durability-input-grid input {
+        width: 100% !important;
+        box-sizing: border-box !important;
+        margin-top: 4px !important;
+        font-size: 12px !important;
+      }
+
+      /* 耐久指数最大化ボタン - 100%幅 */
+      .durability-section button {
+        width: 100% !important;
+      }
+
+      /* 被ダメ割合プリセット - 縦2列グリッド */
+      .preset-grid {
+        display: grid !important;
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 4px !important;
+      }
+
+      /* 保存・読み込み機能の調整 */
+      .save-load-container > div:first-child {
+        display: block !important;
+        gap: 12px !important;
+      }
+
+      .save-load-container > div:first-child > div {
+        margin-bottom: 12px;
+        width: 100%;
+      }
+
+      /* 保存・読み込み機能内のボタンと入力欄の調整 */
+      .save-load-container input[type="text"],
+      .save-load-container select {
+        width: 100%;
+        margin-bottom: 8px;
+        margin-right: 0 !important;
+        box-sizing: border-box;
+      }
+
+      .save-load-container button {
+        width: 100%;
+        margin-bottom: 4px;
+        margin-right: 0 !important;
+      }
+
+      /* 比較機能の調整 */
+      .compare-container > div:first-child {
+        display: block !important;
+        gap: 12px !important;
+      }
+
+      .compare-container > div:first-child > div {
+        margin-bottom: 12px;
+        width: 100%;
+      }
+
+      /* 比較機能内のセレクトボックスとボタンの調整 */
+      .compare-container select {
+        width: 100%;
+        margin-bottom: 8px;
+        margin-right: 0 !important;
+        box-sizing: border-box;
+      }
+
+      .compare-container button {
+        width: 100%;
+        margin-right: 0 !important;
+      }
+
+      /* コンテナ全体のオーバーフロー対策 */
+      .save-load-container,
+      .compare-container {
+        overflow-x: auto;
+        box-sizing: border-box;
+      }
+
+      /* 比較結果テーブルの調整 */
+      .compare-container table {
+        width: 100%;
+        table-layout: fixed;
+        word-wrap: break-word;
+      }
+
+      .compare-container th,
+      .compare-container td {
+        padding: 2px 4px;
+        font-size: 12px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      /* 入力欄のサイズ調整 */
+      input[type="number"],
+      input[type="text"],
+      select {
+        font-size: 14px;
+        padding: 4px 6px;
+      }
+
+      /* ボタンの調整 */
+      button {
+        font-size: 14px;
+        padding: 6px 12px;
+      }
+
+      /* 追加効果表示の調整 */
+      .special-effects {
+        min-width: auto;
+        padding: 12px;
+      }
+
+      .special-effect-item {
+        padding: 6px;
+        margin-bottom: 6px;
+        font-size: 13px;
+      }
+
+      /* モーダルの調整 */
+      .modal-content {
+        width: 90%;
+        margin: 5% auto;
+        padding: 16px;
+      }
+
+      /* 情報モーダルの調整 */
+      .modal-content[style*="width: 600px"] {
+        width: 95% !important;
+      }
+
+      /* タイトルと情報ボタンの調整 */
+      h1 {
+        font-size: 1.3em;
+        margin-bottom: 16px;
+      }
+
+      #info-btn {
+        font-size: 12px !important;
+        padding: 6px 12px !important;
+        margin-left: 8px !important;
+      }
+
+      /* 全て解除ボタンの調整 */
+      #clear-all-btn {
+        width: 100%;
+        margin-top: 8px;
+      }
+
+      /* 装備中カスタムパーツセクションの調整は不要（既に縦並び） */
+
+      /* 比較結果の調整 */
+      #compare-content > div:first-child {
+        display: block !important;
+        grid-template-columns: none !important;
+        gap: 16px !important;
+      }
+
+      #compare-content > div:first-child > div:last-child {
+        display: block !important;
+        grid-template-columns: none !important;
+        gap: 16px !important;
+      }
+
+      #compare-content > div:first-child > div:last-child > div {
+        margin-bottom: 16px;
+      }
+
+      /* 割合入力欄の調整 */
+      .damage-ratio-container input[type="number"] {
+        width: 50px;
+      }
+
+      /* 火力指数・耐久指数表示の調整 */
+      .power-index-display,
+      .durability-index-display {
+        margin-bottom: 8px !important;
+        padding: 8px !important;
+        font-size: 14px !important;
+      }
     }
 
     .status-section {
@@ -285,34 +693,8 @@
 </h1>
 
   <div class="main-container">
-    <!-- 左パネル：カスタムパーツ一覧 -->
-    <div class="left-panel">
-      <h2>カスタムパーツ一覧</h2>
-      <div class="parts-categories">
-        <div class="category-section">
-          <h3>攻撃系パーツ</h3>
-          <div class="parts-list" id="parts-list-attack"></div>
-        </div>
-        <div class="category-section">
-          <h3>防御系パーツ</h3>
-          <div class="parts-list" id="parts-list-defense"></div>
-        </div>
-        <div class="category-section">
-          <h3>移動系パーツ</h3>
-          <div class="parts-list" id="parts-list-move"></div>
-        </div>
-        <div class="category-section">
-          <h3>補助系パーツ</h3>
-          <div class="parts-list" id="parts-list-auxiliary"></div>
-        </div>
-        <div class="category-section">
-          <h3>特殊系パーツ</h3>
-          <div class="parts-list" id="parts-list-special"></div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 右パネル：機体情報、拡張スキル、強化段階、スロット、追加効果 -->
+    <!-- PC用：右パネル：機体情報、拡張スキル、強化段階、スロット、追加効果 -->
+    <!-- スマホ用：最初に表示される -->
     <div class="right-panel">
       <div class="status-section">
         <h2>機体情報</h2>
@@ -455,18 +837,44 @@
         </div>
       </div>
     </div>
+
+    <!-- PC用：左パネル：カスタムパーツ一覧 -->
+    <!-- スマホ用：2番目に表示される -->
+    <div class="left-panel">
+      <h2>カスタムパーツ一覧</h2>
+      <div class="parts-categories">
+        <div class="category-section">
+          <h3>攻撃系パーツ</h3>
+          <div class="parts-list" id="parts-list-attack"></div>
+        </div>
+        <div class="category-section">
+          <h3>防御系パーツ</h3>
+          <div class="parts-list" id="parts-list-defense"></div>
+        </div>
+        <div class="category-section">
+          <h3>移動系パーツ</h3>
+          <div class="parts-list" id="parts-list-move"></div>
+        </div>
+        <div class="category-section">
+          <h3>補助系パーツ</h3>
+          <div class="parts-list" id="parts-list-auxiliary"></div>
+        </div>
+        <div class="category-section">
+          <h3>特殊系パーツ</h3>
+          <div class="parts-list" id="parts-list-special"></div>
+        </div>
+      </div>
+    </div>
   </div>
 
   <!-- 下部パネル：装備中カスタムパーツ -->
   <div class="bottom-panel">
     <div class="equipped-section">
       <h2>装備中カスタムパーツ（クリックで解除）</h2>
-      <div style="display: flex; align-items: flex-start; gap: 16px;">
-        <div class="equipped-grid" id="equipped-grid"></div>
-        <button id="clear-all-btn" style="padding: 8px 16px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px;">
-          全て解除
-        </button>
-      </div>
+      <div class="equipped-grid" id="equipped-grid"></div>
+      <button id="clear-all-btn" style="padding: 8px 16px; background: #f44336; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; margin-top: 12px; display: block;">
+        全て解除
+      </button>
     </div>
   </div>
 
@@ -474,10 +882,10 @@
   <div class="bottom-panel">
     <div class="damage-ratio-container" style="margin: 20px 0; padding: 16px; border: 1px solid #aaa; border-radius: 6px; background: #f8f8ff;">
       <h3>火力指数・耐久指数計算</h3>
-      <div style="display: flex; gap: 24px;">
+      <div class="damage-ratio-content" style="display: flex; gap: 24px;">
         <!-- 火力指数部分 -->
-        <div style="flex: 1;">
-          <div style="margin-bottom: 16px;">
+        <div class="power-section" style="flex: 1;">
+          <div class="damage-input-grid" style="margin-bottom: 16px;">
             <label style="margin-right: 16px;">
               射撃与ダメ割合：
               <input type="number" id="shooting_ratio" value="50" min="0" style="width: 60px;">
@@ -490,22 +898,19 @@
           <div class="power-index-display" style="padding: 12px; background: #fff; border: 1px solid #ddd; border-radius: 4px;">
             <div style="font-weight: bold;">火力指数：<span id="power_index">0</span></div>
           </div>
-          <button id="maximize-power-btn" style="margin-top: 8px; padding: 8px 16px; font-size: 14px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; width: 100%;">
-            火力指数最大化
-          </button>
-                  <!-- スラスター部分 -->
-        <div style="flex: 1;">
-
-          <button id="maximize-thruster-btn" style="margin-top: 8px; padding: 8px 16px; font-size: 14px; background: #FF9800; color: white; border: none; border-radius: 4px; cursor: pointer; width: 100%;">
-            スラスター最大化
-          </button>
-        </div>
-
+          <div class="power-buttons" style="margin-top: 8px;">
+            <button id="maximize-power-btn" style="padding: 8px 16px; font-size: 14px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; width: 100%;">
+              火力指数最大化
+            </button>
+            <button id="maximize-thruster-btn" style="margin-top: 4px; padding: 8px 16px; font-size: 14px; background: #FF9800; color: white; border: none; border-radius: 4px; cursor: pointer; width: 100%;">
+              スラスター最大化
+            </button>
+          </div>
         </div>
 
         <!-- 耐久指数部分 -->
-        <div style="flex: 1;">
-          <div style="margin-bottom: 16px;">
+        <div class="durability-section" style="flex: 1;">
+          <div class="durability-input-grid" style="margin-bottom: 16px;">
             <label style="margin-right: 16px;">
               実弾被ダメ割合：
               <input type="number" id="ballistic_ratio" value="1" min="0" style="width: 60px;">
@@ -528,9 +933,9 @@
         </div>
 
         <!-- 被ダメ割合プリセットボタン -->
-        <div style="width: 200px;">
+        <div class="preset-section" style="width: 200px;">
           <div style="margin-bottom: 8px; font-weight: bold;">被ダメ割合プリセット</div>
-          <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px;">
+          <div class="preset-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 4px;">
             <button onclick="setDamageRatio(50, 10, 40)" style="padding: 4px 8px; font-size: 12px;">300</button>
             <button onclick="setDamageRatio(50, 10, 40)" style="padding: 4px 8px; font-size: 12px;">350</button>
             <button onclick="setDamageRatio(40, 10, 50)" style="padding: 4px 8px; font-size: 12px;">400</button>
@@ -633,7 +1038,7 @@
       <ul>
         <li>まずは機体ステータスを入力してください。</li>
         <li>エンターキーで次の入力欄にいけます。シフト＋エンターで1つ戻る。</li>
-        <li><strong>パーツ装備</strong>：パーツをクリックで詳細表示、ダブルクリックで装備</li>
+        <li><strong>パーツ装備</strong>：パーツをクリックで詳細表示、ダブルクリックまたは長押しで装備</li>
         <li><strong>パーツ解除</strong>：装備中パーツをクリックで解除</li>
         <li><strong>未所持設定</strong>：パーツ詳細画面で「未所持」ボタンをクリック　未所持パーツは自動装備されなくなります。未所持設定は保存されます。</li>
         <li>パーツ詳細は画面のどこをクリックしても閉じられます。</li>
@@ -643,7 +1048,7 @@
       <p><strong>火力指数</strong>：射撃・格闘の与ダメージ割合を設定して計算されます</p>
       <p><strong>耐久指数</strong>：実弾・ビーム・格闘の被ダメージ割合を設定して計算されます</p>
       <p>「最大化」ボタンで自動的に最適なパーツを装備できます</p>
-　　　<p>※拡張装甲で空きスロットが多いと、計算にかなり時間がかかります。</p>
+      <p>※拡張装甲で空きスロットが多いと、計算にかなり時間がかかります。</p>
       
       <h4>保存・読み込み機能</h4>
       <p>機体情報を保存して後で読み込むことができます。比較機能もあるよ</p>
@@ -651,8 +1056,8 @@
 
       
       <h4>更新履歴・その他</h4>
-      <p>最終更新: 2025年8月1日</p>
-      <p>そのうちスマホ対応するかも</p>
+      <p>最終更新: 2025年8月5日</p>
+      <p>スマホでも使いやすくなりました</p>
       <p>不具合報告や要望は、XのDMまで@8LpdFhYmxHfrOV9</p>
     </div>
     <div class="modal-footer">
@@ -1993,26 +2398,20 @@
             btn.classList.add('disabled');
             btn.title = "スロット数が足りません";
           } else {
-            btn.title = "クリックで詳細表示、ダブルクリックで装備";
+            btn.title = "クリックで詳細表示、ダブルクリック・長押しで装備";
           }
+          
           let clickTimer = null;
-          btn.onclick = () => {
-            if (clickTimer === null) {
-              clickTimer = setTimeout(() => {
-                clickTimer = null;
-                openPartModal(part);
-              }, 200);
-            }
-          };
-          btn.ondblclick = () => {
-            if (!canEquipSlots) return; // 未所持でも装備可能にするため、ownedPartsのチェックを削除
-            clearTimeout(clickTimer);
-            clickTimer = null;
+          let longPressTimer = null;
+          let isLongPress = false;
+
+          // 装備処理関数
+          const equipPart = () => {
+            if (!canEquipSlots) return;
             let canEquip =
               !equipped.includes(part) &&
               equipped.filter(e => e).length < 8 &&
               !(part.type && equipped.some(e => e && e.type === part.type)) &&
-              // 補給パックとクイックローダー/補助ジェネレーターの同時装備制限をチェック
               !(part.type === "補給パック" && equipped.some(e => e && (e.name.includes("クイックローダー") || e.name.includes("補助ジェネレーター")))) &&
               !((part.name.includes("クイックローダー") || part.name.includes("補助ジェネレーター")) && equipped.some(e => e && e.type === "補給パック"));
             
@@ -2026,6 +2425,61 @@
               }
             }
           };
+
+          // クリック処理
+          btn.onclick = () => {
+            if (isLongPress) {
+              isLongPress = false;
+              return;
+            }
+            if (clickTimer === null) {
+              clickTimer = setTimeout(() => {
+                clickTimer = null;
+                openPartModal(part);
+              }, 200);
+            }
+          };
+
+          // ダブルクリック処理
+          btn.ondblclick = () => {
+            clearTimeout(clickTimer);
+            clickTimer = null;
+            equipPart();
+          };
+
+          // 長押し開始（マウス・タッチ対応）
+          const startLongPress = (e) => {
+            if (e.type === 'mousedown' && e.button !== 0) return; // 左クリック以外は無視
+            
+            isLongPress = false;
+            longPressTimer = setTimeout(() => {
+              isLongPress = true;
+              // 長押し成功の視覚フィードバック
+              btn.style.backgroundColor = '#c8e6c9';
+              setTimeout(() => {
+                btn.style.backgroundColor = '';
+              }, 150);
+              equipPart();
+            }, 500); // 500ms長押し
+          };
+
+          // 長押し終了
+          const endLongPress = () => {
+            if (longPressTimer) {
+              clearTimeout(longPressTimer);
+              longPressTimer = null;
+            }
+          };
+
+          // タッチイベント（スマホ対応）
+          btn.addEventListener('touchstart', startLongPress, { passive: true });
+          btn.addEventListener('touchend', endLongPress, { passive: true });
+          btn.addEventListener('touchcancel', endLongPress, { passive: true });
+
+          // マウスイベント（PC対応）
+          btn.addEventListener('mousedown', startLongPress);
+          btn.addEventListener('mouseup', endLongPress);
+          btn.addEventListener('mouseleave', endLongPress);
         }
         getCategoryList(part.category).appendChild(btn);
       });
@@ -3889,7 +4343,8 @@ function setupBidirectionalEnterNavigation() {
           const targetInput = document.getElementById(allInputs[nextIndex]);
           if (targetInput) {
             targetInput.focus();
-            targetInput.select();
+            // キーボード描画後でも確実に選択されるよう 0ms 遅延（参考コードと同じ方法）
+            setTimeout(() => targetInput.select(), 0);
           }
         }
       });
@@ -3899,6 +4354,70 @@ function setupBidirectionalEnterNavigation() {
 
 // 実行
 setupBidirectionalEnterNavigation();
+
+// フォーカス時（タップ時）にも全選択（参考コードと同じ方法）
+document.addEventListener('focusin', e => {
+  const el = e.target;
+  // 数値入力欄のみ対象とする
+  if (el.tagName === 'INPUT' && el.type === 'number') {
+    setTimeout(() => el.select(), 0);
+  }
+});
+
+// カテゴリ折りたたみ機能（スマホのみ）
+function setupCategoryCollapse() {
+  // スマホかどうかの判定
+  function isMobile() {
+    return window.innerWidth <= 768;
+  }
+
+  // 初期状態設定（スマホでは最初のカテゴリ以外を折りたたみ）
+  function initializeCategories() {
+    if (isMobile()) {
+      const categories = document.querySelectorAll('.category-section');
+      categories.forEach((category, index) => {
+        if (index > 0) { // 最初のカテゴリ（攻撃系）以外を折りたたみ
+          category.classList.add('collapsed');
+        }
+      });
+    }
+  }
+
+  // カテゴリヘッダーのクリックイベント
+  function setupCategoryClickEvents() {
+    const categoryHeaders = document.querySelectorAll('.category-section h3');
+    categoryHeaders.forEach(header => {
+      header.addEventListener('click', function() {
+        if (isMobile()) { // スマホでのみ動作
+          const categorySection = this.parentElement;
+          categorySection.classList.toggle('collapsed');
+        }
+      });
+    });
+  }
+
+  // ウィンドウリサイズ時の処理
+  function handleResize() {
+    const categories = document.querySelectorAll('.category-section');
+    if (!isMobile()) {
+      // PCモードでは全て展開
+      categories.forEach(category => {
+        category.classList.remove('collapsed');
+      });
+    } else {
+      // スマホモードでは初期状態に戻す
+      initializeCategories();
+    }
+  }
+
+  // 初期化
+  initializeCategories();
+  setupCategoryClickEvents();
+  window.addEventListener('resize', handleResize);
+}
+
+// カテゴリ折りたたみ機能を実行
+setupCategoryCollapse();
 // 情報モーダルの制御
 function openInfoModal() {
   document.getElementById('info-modal').style.display = 'block';
