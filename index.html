@@ -1313,6 +1313,17 @@
         },
         category: "attackparts", useAttackParts: true
       },
+      {
+        name: "レベルリンクシステム［射撃］",
+        type: "レベルリンクシステム",
+        slot: { short: 1, middle: 3, long: 3 },
+        levelEffects: {
+          base: { shooting: 8 },
+          perLevel: { shooting: 2 },
+          maxBonus: { shooting: 16 }
+        },
+        category: "attackparts", useAttackParts: true
+      },
 
       // 防御パーツ
       { name: "強化フレーム LV1",  hp: 200, slot: { short: 0, middle: 0, long: 1 }, category: "defparts", useDefParts: true },
@@ -4448,3 +4459,4 @@ window.addEventListener('click', function(event) {
   </script>
 </body>
 </html>
+
