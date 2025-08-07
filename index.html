@@ -4382,14 +4382,12 @@ function setupCategoryCollapse() {
     return window.innerWidth <= 768;
   }
 
-  // 初期状態設定（スマホでは最初のカテゴリ以外を折りたたみ）
+  // 初期状態設定（スマホでは全てのカテゴリを折りたたみ）
   function initializeCategories() {
     if (isMobile()) {
       const categories = document.querySelectorAll('.category-section');
-      categories.forEach((category, index) => {
-        if (index > 0) { // 最初のカテゴリ（攻撃系）以外を折りたたみ
-          category.classList.add('collapsed');
-        }
+      categories.forEach((category) => {
+        category.classList.add('collapsed'); // 全てのカテゴリを折りたたみ
       });
     }
   }
@@ -4459,4 +4457,5 @@ window.addEventListener('click', function(event) {
   </script>
 </body>
 </html>
+
 
