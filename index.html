@@ -2642,8 +2642,18 @@
         part.specialEffects.forEach(effect => {
           let value = effect.value;
           // レベル依存の効果の場合、現在の効果量を計算
-          if (part.levelEffects && part.levelEffects.base[effect.type]) {
-            value = getPartEffect(part, effect.type);
+          let levelEffectType = effect.type;
+          // オーバーチューン装甲系パーツの場合、対応するlevelEffectsのtypeにマッピング
+          if (effect.type === 'ballistic_reduction' && part.levelEffects && part.levelEffects.base['ballistic_reduction_overtune']) {
+            levelEffectType = 'ballistic_reduction_overtune';
+          } else if (effect.type === 'beam_reduction' && part.levelEffects && part.levelEffects.base['beam_reduction_overtune']) {
+            levelEffectType = 'beam_reduction_overtune';
+          } else if (effect.type === 'melee_reduction' && part.levelEffects && part.levelEffects.base['melee_reduction_overtune']) {
+            levelEffectType = 'melee_reduction_overtune';
+          }
+          
+          if (part.levelEffects && part.levelEffects.base[levelEffectType]) {
+            value = getPartEffect(part, levelEffectType);
           }
           statsHtml += `<tr><th>追加効果</th><td>${effect.text.replace('%d', value)}</td></tr>`;
         });
@@ -3052,8 +3062,18 @@
               };
             }
             // レベル依存の効果の場合、現在の効果量を計算
-            if (part.levelEffects && part.levelEffects.base[effect.type]) {
-              const currentEffect = getPartEffect(part, effect.type);
+            let levelEffectType = effect.type;
+            // オーバーチューン装甲系パーツの場合、対応するlevelEffectsのtypeにマッピング
+            if (effect.type === 'ballistic_reduction' && part.levelEffects && part.levelEffects.base['ballistic_reduction_overtune']) {
+              levelEffectType = 'ballistic_reduction_overtune';
+            } else if (effect.type === 'beam_reduction' && part.levelEffects && part.levelEffects.base['beam_reduction_overtune']) {
+              levelEffectType = 'beam_reduction_overtune';
+            } else if (effect.type === 'melee_reduction' && part.levelEffects && part.levelEffects.base['melee_reduction_overtune']) {
+              levelEffectType = 'melee_reduction_overtune';
+            }
+            
+            if (part.levelEffects && part.levelEffects.base[levelEffectType]) {
+              const currentEffect = getPartEffect(part, levelEffectType);
               // 重複しない効果の場合は、より大きい値を採用
               if (effect.unique) {
                 effectTotals[effect.type].value = Math.max(effectTotals[effect.type].value, currentEffect);
@@ -3249,14 +3269,29 @@
       equipped.forEach(part => {
         if (part && part.specialEffects) {
           part.specialEffects.forEach(effect => {
+            let value = effect.value;
+            // オーバーチューン装甲系パーツの場合、levelEffectsから効果量を取得
+            let levelEffectType = effect.type;
+            if (effect.type === 'ballistic_reduction' && part.levelEffects && part.levelEffects.base['ballistic_reduction_overtune']) {
+              levelEffectType = 'ballistic_reduction_overtune';
+            } else if (effect.type === 'beam_reduction' && part.levelEffects && part.levelEffects.base['beam_reduction_overtune']) {
+              levelEffectType = 'beam_reduction_overtune';
+            } else if (effect.type === 'melee_reduction' && part.levelEffects && part.levelEffects.base['melee_reduction_overtune']) {
+              levelEffectType = 'melee_reduction_overtune';
+            }
+            
+            if (part.levelEffects && part.levelEffects.base[levelEffectType]) {
+              value = getPartEffect(part, levelEffectType);
+            }
+            
             if (effect.type === 'ballistic_reduction') {
-              ballisticReduction += effect.value;
+              ballisticReduction += value;
             }
             if (effect.type === 'beam_reduction') {
-              beamReduction += effect.value;
+              beamReduction += value;
             }
             if (effect.type === 'melee_reduction') {
-              meleeReduction += effect.value;
+              meleeReduction += value;
             }
           });
         }
@@ -3379,9 +3414,24 @@ function calculateDurabilityIndexFast(testEquipped) {
   testEquipped.forEach(part => {
     if (part && part.specialEffects) {
       part.specialEffects.forEach(effect => {
-        if (effect.type === 'ballistic_reduction') ballisticReduction += effect.value;
-        if (effect.type === 'beam_reduction') beamReduction += effect.value;
-        if (effect.type === 'melee_reduction') meleeReduction += effect.value;
+        let value = effect.value;
+        // オーバーチューン装甲系パーツの場合、levelEffectsから効果量を取得
+        let levelEffectType = effect.type;
+        if (effect.type === 'ballistic_reduction' && part.levelEffects && part.levelEffects.base['ballistic_reduction_overtune']) {
+          levelEffectType = 'ballistic_reduction_overtune';
+        } else if (effect.type === 'beam_reduction' && part.levelEffects && part.levelEffects.base['beam_reduction_overtune']) {
+          levelEffectType = 'beam_reduction_overtune';
+        } else if (effect.type === 'melee_reduction' && part.levelEffects && part.levelEffects.base['melee_reduction_overtune']) {
+          levelEffectType = 'melee_reduction_overtune';
+        }
+        
+        if (part.levelEffects && part.levelEffects.base[levelEffectType]) {
+          value = getPartEffect(part, levelEffectType);
+        }
+        
+        if (effect.type === 'ballistic_reduction') ballisticReduction += value;
+        if (effect.type === 'beam_reduction') beamReduction += value;
+        if (effect.type === 'melee_reduction') meleeReduction += value;
       });
     }
   });
