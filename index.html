@@ -4581,30 +4581,44 @@ function setupCategoryCollapse() {
     });
   });
   
-  // 画面サイズに応じた初期状態を設定
-  setInitialCategoryState();
+  // 画面サイズに応じた初期状態を設定（初回のみ既定状態を適用）
+  setInitialCategoryState(true);
 }
 
-function setInitialCategoryState() {
+function setInitialCategoryState(isInitial = false) {
   const categoryContents = document.querySelectorAll('.category-content');
   const categorySections = document.querySelectorAll('.category-section');
   const isMobile = window.innerWidth <= 768;
   
   if (isMobile) {
-    // スマホ：デフォルトで折りたたみ
-    categorySections.forEach(section => {
-      section.classList.remove('collapsed', 'expanded');
-    });
+    // モバイル：初回は既定で閉じる。リサイズでは現在の expanded を保持しつつ高さだけ再計算
+    if (isInitial) {
+      categorySections.forEach(section => {
+        section.classList.remove('collapsed');
+      });
+    }
     categoryContents.forEach(content => {
-      content.style.maxHeight = '0';
+      const section = content.closest('.category-section');
+      if (section && section.classList.contains('expanded')) {
+        content.style.maxHeight = content.scrollHeight + 'px';
+      } else {
+        content.style.maxHeight = '0';
+      }
     });
   } else {
-    // PC：デフォルトで展開
-    categorySections.forEach(section => {
-      section.classList.remove('collapsed', 'expanded');
-    });
+    // デスクトップ：初回は既定で開く。リサイズでは現在の collapsed を保持しつつ高さだけ再計算
+    if (isInitial) {
+      categorySections.forEach(section => {
+        section.classList.remove('expanded');
+      });
+    }
     categoryContents.forEach(content => {
-      content.style.maxHeight = content.scrollHeight + 'px';
+      const section = content.closest('.category-section');
+      if (section && section.classList.contains('collapsed')) {
+        content.style.maxHeight = '0';
+      } else {
+        content.style.maxHeight = content.scrollHeight + 'px';
+      }
     });
   }
 }
@@ -4614,9 +4628,36 @@ window.addEventListener('load', function() {
   setupCategoryCollapse();
 });
 
-// 画面サイズ変更時に初期状態をリセット
+// 画面サイズ変更時は状態を保持して高さのみ再計算
+let __lastResizeInnerWidth = window.innerWidth;
+function __recalcCategoryHeights() {
+  const categoryContents = document.querySelectorAll('.category-content');
+  const isMobile = window.innerWidth <= 768;
+  categoryContents.forEach(content => {
+    const section = content.closest('.category-section');
+    if (isMobile) {
+      if (section && section.classList.contains('expanded')) {
+        content.style.maxHeight = content.scrollHeight + 'px';
+      } else {
+        content.style.maxHeight = '0';
+      }
+    } else {
+      if (section && section.classList.contains('collapsed')) {
+        content.style.maxHeight = '0';
+      } else {
+        content.style.maxHeight = content.scrollHeight + 'px';
+      }
+    }
+  });
+}
 window.addEventListener('resize', function() {
-  setInitialCategoryState();
+  // アドレスバーの出し入れ等で innerHeight が変わっても innerWidth が同じなら状態維持
+  if (window.innerWidth !== __lastResizeInnerWidth) {
+    setInitialCategoryState(false);
+    __lastResizeInnerWidth = window.innerWidth;
+  } else {
+    __recalcCategoryHeights();
+  }
 });
 
   </script>
