@@ -874,6 +874,35 @@
         </table>
       </div>
 
+      <!-- カテゴリ特攻プログラム -->
+      <div class="status-section">
+        <h3>カテゴリ特攻プログラム用設定</h3>
+        <div style="margin: 8px 0;">
+          <div style="margin-bottom: 8px;">
+            <div style="display: flex; gap: 8px; margin-top: 4px; flex-wrap: wrap;">
+              <button type="button" id="category-assault" onclick="selectCategoryProgram('assault')" 
+                      style="padding: 4px 12px; border: 1px solid #aaa; border-radius: 4px; background: #f0f0f0; cursor: pointer; min-width: 60px;">
+                強襲
+              </button>
+              <button type="button" id="category-general" onclick="selectCategoryProgram('general')" 
+                      style="padding: 4px 12px; border: 1px solid #aaa; border-radius: 4px; background: #f0f0f0; cursor: pointer; min-width: 60px;">
+                汎用
+              </button>
+              <button type="button" id="category-support" onclick="selectCategoryProgram('support')" 
+                      style="padding: 4px 12px; border: 1px solid #aaa; border-radius: 4px; background: #f0f0f0; cursor: pointer; min-width: 60px;">
+                支援
+              </button>
+            </div>
+          </div>
+          <div style="margin-top: 8px;">
+            <label for="category_damage_ratio">有利カテゴリへの与ダメ割合:</label>
+            <input type="number" id="category_damage_ratio" value="50" min="0" max="100" style="width: 60px; margin-left: 8px;">
+            <span style="margin-left: 4px;">%</span>
+          </div>
+        </div>
+        <input type="hidden" id="selected_category" value="">
+      </div>
+
       <!-- 追加効果 -->
       <div class="status-section">
         <div class="special-effects">
@@ -1379,6 +1408,15 @@
         },
         category: "attackparts", useAttackParts: true
       },
+      {
+    name: "カテゴリ特攻プログラム［強襲］",
+    slot: { short: 2, middle: 3, long: 4 },
+    shooting: 7,fighting: 7,
+    categoryadvantage: 0.00077,
+    type: "カテゴリ特攻プログラム",
+    specialEffect: "強襲機のみ装備可能。支援機へのダメージを130%から140%に",
+    category: "attackparts", useAttackParts: true
+  },
 
       // 防御パーツ
       { name: "強化フレーム LV1",  hp: 200, slot: { short: 0, middle: 0, long: 1 }, category: "defparts", useDefParts: true },
@@ -2245,20 +2283,25 @@
   {
     name: "カテゴリ特攻プログラム［支援］",
     slot: { short: 2, middle: 4, long: 4 },
+    categoryadvantage: 0.00077,
+    type: "カテゴリ特攻プログラム",
     specialEffects: [
       { type: "ballistic_reduction", value: 5, text: "実弾被ダメージを%d%軽減" },
       { type: "beam_reduction", value: 5, text: "ビーム被ダメージを%d%軽減" },
       { type: "melee_reduction", value: 5, text: "格闘被ダメージを%d%軽減" }
     ],
-    specialEffect: "支援機のみ装備可能。汎用機へのダメージを130%から140%に(火力指数非対応)。",
-    category: "specialparts"
+    specialEffect: "支援機のみ装備可能。汎用機へのダメージを130%から140%に",
+    category: "specialparts",
+    useAttackParts: true
   },
   {
     name: "カテゴリ特攻プログラム［汎用］",
     slot: { short: 4, middle: 1, long: 4 },
     hp: 2000,
-    specialEffect: "汎用機のみ装備可能。強襲機へのダメージを130%から140%に(火力指数非対応)。",
-    category: "specialparts", useDefParts: true
+    categoryadvantage: 0.00077,
+    type: "カテゴリ特攻プログラム",
+    specialEffect: "汎用機のみ装備可能。強襲機へのダメージを130%から140%に",
+    category: "specialparts", useDefParts: true,useAttackParts: true
   },
     ];
 
@@ -3245,10 +3288,27 @@
       shootingDamageOvertune = Math.min(shootingDamageOvertune, 10);
       meleeDamageOvertune = Math.min(meleeDamageOvertune, 12);
 
-      // 火力指数の計算
-      const powerIndex = 
+      // カテゴリ特攻プログラムの効果を計算
+      const categoryDamageRatio = getNum('category_damage_ratio');
+      const selectedCategory = document.getElementById('selected_category').value;
+      
+      let categoryAdvantageBonus = 0;
+      if (categoryDamageRatio > 0) {
+        // 装備中のカテゴリ特攻プログラムのcategoryadvantageを取得
+        equipped.forEach(part => {
+          if (part && part.categoryadvantage) {
+            categoryAdvantageBonus += part.categoryadvantage;
+          }
+        });
+      }
+      
+      // 火力指数の計算（カテゴリ特攻効果を含む）
+      const basePowerIndex = 
         (shootingRatio * normalizationFactor * ((total.shooting + 100) / 100) * (1 + (shootingDamageBonus + shootingDamageOvertune) / 100) +
-        fightingRatio * normalizationFactor * ((total.fighting + 100) / 100) * (1 + (meleeDamageBonus + meleeDamageOvertune) / 100))*100;
+        fightingRatio * normalizationFactor * ((total.fighting + 100) / 100) * (1 + (meleeDamageBonus + meleeDamageOvertune) / 100));
+      
+      const categoryMultiplier = 1 + categoryAdvantageBonus * categoryDamageRatio ;
+      const powerIndex = basePowerIndex * categoryMultiplier * 100;
 
       // 火力指数の表示を更新
       document.getElementById('power_index').textContent = powerIndex.toFixed(1);
@@ -3612,6 +3672,33 @@ function maximizeThruster() {
     renderPartsList();
     renderEquipped();
     updateStatus();
+
+    // カテゴリ特攻プログラム選択関数
+    function selectCategoryProgram(category) {
+      // 全ボタンのスタイルをリセット
+      document.getElementById('category-assault').style.background = '#f0f0f0';
+      document.getElementById('category-general').style.background = '#f0f0f0';
+      document.getElementById('category-support').style.background = '#f0f0f0';
+      document.getElementById('category-assault').style.color = 'black';
+      document.getElementById('category-general').style.color = 'black';
+      document.getElementById('category-support').style.color = 'black';
+      
+      // 選択されたボタンをハイライト
+      document.getElementById('category-' + category).style.background = '#4CAF50';
+      document.getElementById('category-' + category).style.color = 'white';
+      
+      // 選択されたカテゴリを記録
+      document.getElementById('selected_category').value = category;
+      
+      // ステータス更新
+      updateStatus();
+    }
+
+    // selectCategoryProgramをグローバルスコープに登録
+    window.selectCategoryProgram = selectCategoryProgram;
+
+    // カテゴリ特攻プログラムの与ダメ割合変更時にステータス更新
+    document.getElementById('category_damage_ratio').addEventListener('input', updateStatus);
 // 軽量な火力指数計算関数
 function calculatePowerIndexFast(testEquipped) {
   const getNum = id => Number(document.getElementById(id).value) || 0;
@@ -3754,9 +3841,25 @@ function calculatePowerIndexFast(testEquipped) {
   const totalRatio = shootingRatio + fightingRatio;
   const normalizationFactor = totalRatio > 0 ? 1 / totalRatio : 0;
 
-  const powerIndex = 
+  // カテゴリ特攻プログラムの効果を計算
+  const categoryDamageRatio = getNum('category_damage_ratio');
+  const selectedCategory = document.getElementById('selected_category').value;
+  
+  let categoryAdvantageBonus = 0;
+  if (categoryDamageRatio > 0) {
+    testEquipped.forEach(part => {
+      if (part && part.categoryadvantage) {
+        categoryAdvantageBonus += part.categoryadvantage;
+      }
+    });
+  }
+
+  const basePowerIndex = 
     (shootingRatio * normalizationFactor * ((total.shooting + 100) / 100) * (1 + (shootingDamageBonus + shootingDamageOvertune) / 100) +
-    fightingRatio * normalizationFactor * ((total.fighting + 100) / 100) * (1 + (meleeDamageBonus + meleeDamageOvertune) / 100)) * 100;
+    fightingRatio * normalizationFactor * ((total.fighting + 100) / 100) * (1 + (meleeDamageBonus + meleeDamageOvertune) / 100));
+  
+  const categoryMultiplier = 1 + categoryAdvantageBonus * categoryDamageRatio ;
+  const powerIndex = basePowerIndex * categoryMultiplier * 100;
 
   return powerIndex;
 }
@@ -3769,6 +3872,19 @@ function maximizePowerIndex() {
     
     const isBaseAttackPart = (part.category === "attackparts" || part.category === "specialparts") && part.useAttackParts === true;
     const isCustomAttackPart = isCustomAttackSelected && part.category === "moveparts" && part.useAttackParts === true;
+    
+    // カテゴリ特攻プログラムのフィルタリング
+    const selectedCategory = document.getElementById('selected_category').value;
+    if (part.type === "カテゴリ特攻プログラム") {
+      // 強襲、汎用選択時は支援用を除外
+      if ((selectedCategory === 'assault' || selectedCategory === 'general') && part.name === "カテゴリ特攻プログラム［支援］") {
+        return false;
+      }
+      // 支援、汎用選択時は強襲用を除外（強襲用パーツがある場合）
+      if ((selectedCategory === 'support' || selectedCategory === 'general') && part.name === "カテゴリ特攻プログラム［強襲］") {
+        return false;
+      }
+    }
     
     return (isBaseAttackPart || isCustomAttackPart) && ownedParts[part.name];
   });
@@ -3901,6 +4017,16 @@ function maximizeDurabilityIndex() {
         }
       }
     }
+    
+    // カテゴリ特攻プログラムのフィルタリング
+    const selectedCategory = document.getElementById('selected_category').value;
+    if (part.type === "カテゴリ特攻プログラム") {
+      // 強襲、支援選択時は汎用用を除外
+      if ((selectedCategory === 'assault' || selectedCategory === 'support') && part.name === "カテゴリ特攻プログラム［汎用］") {
+        return false;
+      }
+    }
+    
     return (isBaseDefensePart || isCustomHpPart || isCustomArmorPart) && ownedParts[part.name];
   });
 
@@ -4059,6 +4185,10 @@ function maximizeDurabilityIndex() {
           beam: Number(document.getElementById('beam_ratio').value),
           melee: Number(document.getElementById('melee_ratio').value)
         },
+        categoryProgram: {
+          selectedCategory: document.getElementById('selected_category').value,
+          damageRatio: Number(document.getElementById('category_damage_ratio').value)
+        },
         equipped: equipped.map(part => part ? {
           name: part.name,
           category: part.category,
@@ -4135,6 +4265,35 @@ function maximizeDurabilityIndex() {
         document.getElementById('ballistic_ratio').value = data.damageRatios.ballistic;
         document.getElementById('beam_ratio').value = data.damageRatios.beam;
         document.getElementById('melee_ratio').value = data.damageRatios.melee;
+      }
+
+      // カテゴリ特攻プログラム設定を復元
+      if (data.categoryProgram) {
+        document.getElementById('category_damage_ratio').value = data.categoryProgram.damageRatio || 50;
+        if (data.categoryProgram.selectedCategory) {
+          selectCategoryProgram(data.categoryProgram.selectedCategory);
+        } else {
+          // 選択をクリア
+          document.getElementById('selected_category').value = '';
+          ['assault', 'general', 'support'].forEach(cat => {
+            const btn = document.getElementById('category-' + cat);
+            if (btn) {
+              btn.style.background = '#f0f0f0';
+              btn.style.color = 'black';
+            }
+          });
+        }
+      } else {
+        // 旧データの場合は既定値を設定
+        document.getElementById('category_damage_ratio').value = 50;
+        document.getElementById('selected_category').value = '';
+        ['assault', 'general', 'support'].forEach(cat => {
+          const btn = document.getElementById('category-' + cat);
+          if (btn) {
+            btn.style.background = '#f0f0f0';
+            btn.style.color = 'black';
+          }
+        });
       }
 
       // 装備パーツを設定
@@ -4262,6 +4421,89 @@ function maximizeDurabilityIndex() {
       const effects1 = aggregateSpecialEffects(data1.equipped);
       const effects2 = aggregateSpecialEffects(data2.equipped);
 
+      // 比較用指数計算関数
+      function calculatePowerIndexForData(data) {
+        const equipped = data.equipped.map(partData => {
+          if (!partData) return null;
+          return customParts.find(part => part.name === partData.name) || null;
+        });
+
+        // 基本ステータス計算
+        let total = {
+          shooting: data.base.shooting,
+          fighting: data.base.fighting
+        };
+
+        // 装備効果の計算
+        let shootingDamageBonus = 0;
+        let meleeDamageBonus = 0;
+        let shootingDamageOvertune = 0;
+        let meleeDamageOvertune = 0;
+
+        equipped.forEach(part => {
+          if (part) {
+            if (part.shooting) total.shooting += part.shooting;
+            if (part.fighting) total.fighting += part.fighting;
+
+            if (part.specialEffects) {
+              part.specialEffects.forEach(effect => {
+                if (effect.type === 'shooting_damage') {
+                  shootingDamageBonus += effect.value;
+                }
+                if (effect.type === 'melee_damage') {
+                  meleeDamageBonus += effect.value;
+                }
+                if (effect.type === 'shooting_damage_overtune') {
+                  shootingDamageOvertune += effect.value;
+                }
+                if (effect.type === 'melee_damage_overtune') {
+                  meleeDamageOvertune += effect.value;
+                }
+              });
+            }
+          }
+        });
+
+        // 拡張スキル効果（簡略化）
+        // 省略: 正確な拡張スキル計算は複雑なため基本計算のみ
+
+        // オーバーチューン上限
+        shootingDamageOvertune = Math.min(shootingDamageOvertune, 10);
+        meleeDamageOvertune = Math.min(meleeDamageOvertune, 12);
+
+        // カテゴリ特攻プログラムの効果
+        const categoryDamageRatio = data.categoryProgram ? data.categoryProgram.damageRatio : 0;
+        const selectedCategory = data.categoryProgram ? data.categoryProgram.selectedCategory : '';
+        
+        let categoryAdvantageBonus = 0;
+        if (categoryDamageRatio > 0) {
+          equipped.forEach(part => {
+            if (part && part.categoryadvantage) {
+              categoryAdvantageBonus += part.categoryadvantage;
+            }
+          });
+        }
+
+        // 火力指数計算
+        const shootingRatio = data.damageRatios.shooting;
+        const fightingRatio = data.damageRatios.fighting;
+        const totalRatio = shootingRatio + fightingRatio;
+        const normalizationFactor = totalRatio > 0 ? 1 / totalRatio : 0;
+
+        const basePowerIndex = 
+          (shootingRatio * normalizationFactor * ((total.shooting + 100) / 100) * (1 + (shootingDamageBonus + shootingDamageOvertune) / 100) +
+          fightingRatio * normalizationFactor * ((total.fighting + 100) / 100) * (1 + (meleeDamageBonus + meleeDamageOvertune) / 100));
+        
+        const categoryMultiplier = 1 + categoryAdvantageBonus * categoryDamageRatio ;
+        return basePowerIndex * categoryMultiplier * 100;
+      }
+
+      function calculateDurabilityIndexForData(data) {
+        // 耐久指数計算（簡略化）
+        // 実際の計算は複雑なため、保存された値または簡略計算を使用
+        return data.durabilityIndex || 0;
+      }
+
       // 比較結果を表示
       const compareResult = document.getElementById('compare-result');
       const compareContent = document.getElementById('compare-content');
@@ -4357,17 +4599,17 @@ function maximizeDurabilityIndex() {
               </tr>
               <tr>
                 <td>火力指数</td>
-                <td>${data1.powerIndex.toFixed(1)}</td>
-                <td>${data1.powerIndex > data2.powerIndex ? ((data1.powerIndex / data2.powerIndex - 1) * 100).toFixed(1) + '%' : '-'}</td>
-                <td>${data2.powerIndex > data1.powerIndex ? ((data2.powerIndex / data1.powerIndex - 1) * 100).toFixed(1) + '%' : '-'}</td>
-                <td>${data2.powerIndex.toFixed(1)}</td>
+                <td>${calculatePowerIndexForData(data1).toFixed(1)}</td>
+                <td>${calculatePowerIndexForData(data1) > calculatePowerIndexForData(data2) ? ((calculatePowerIndexForData(data1) / calculatePowerIndexForData(data2) - 1) * 100).toFixed(1) + '%' : '-'}</td>
+                <td>${calculatePowerIndexForData(data2) > calculatePowerIndexForData(data1) ? ((calculatePowerIndexForData(data2) / calculatePowerIndexForData(data1) - 1) * 100).toFixed(1) + '%' : '-'}</td>
+                <td>${calculatePowerIndexForData(data2).toFixed(1)}</td>
               </tr>
               <tr>
                 <td>耐久指数</td>
-                <td>${data1.durabilityIndex.toFixed(0)}</td>
-                <td>${data1.durabilityIndex > data2.durabilityIndex ? ((data1.durabilityIndex / data2.durabilityIndex - 1) * 100).toFixed(1) + '%' : '-'}</td>
-                <td>${data2.durabilityIndex > data1.durabilityIndex ? ((data2.durabilityIndex / data1.durabilityIndex - 1) * 100).toFixed(1) + '%' : '-'}</td>
-                <td>${data2.durabilityIndex.toFixed(0)}</td>
+                <td>${calculateDurabilityIndexForData(data1).toFixed(0)}</td>
+                <td>${calculateDurabilityIndexForData(data1) > calculateDurabilityIndexForData(data2) ? ((calculateDurabilityIndexForData(data1) / calculateDurabilityIndexForData(data2) - 1) * 100).toFixed(1) + '%' : '-'}</td>
+                <td>${calculateDurabilityIndexForData(data2) > calculateDurabilityIndexForData(data1) ? ((calculateDurabilityIndexForData(data2) / calculateDurabilityIndexForData(data1) - 1) * 100).toFixed(1) + '%' : '-'}</td>
+                <td>${calculateDurabilityIndexForData(data2).toFixed(0)}</td>
               </tr>
             </table>
           </div>
@@ -4408,6 +4650,16 @@ function maximizeDurabilityIndex() {
                   <tr><td>格闘</td><td>${data1.damageRatios.melee}</td></tr>
                 </table>
               </div>
+              <div>
+                <h6>カテゴリ特攻プログラム用設定</h6>
+                <table>
+                  <tr><td>カテゴリ</td><td>${data1.categoryProgram && data1.categoryProgram.selectedCategory ? 
+                    (data1.categoryProgram.selectedCategory === 'assault' ? '強襲' : 
+                     data1.categoryProgram.selectedCategory === 'general' ? '汎用' : 
+                     data1.categoryProgram.selectedCategory === 'support' ? '支援' : '未選択') : '未選択'}</td></tr>
+                  <tr><td>有利カテゴリへの与ダメ割合</td><td>${data1.categoryProgram ? data1.categoryProgram.damageRatio : 50}%</td></tr>
+                </table>
+              </div>
             </div>
 
             <!-- データ2の情報 -->
@@ -4444,6 +4696,16 @@ function maximizeDurabilityIndex() {
                   <tr><td>格闘</td><td>${data2.damageRatios.melee}</td></tr>
                 </table>
               </div>
+              <div>
+                <h6>カテゴリ特攻プログラム用設定</h6>
+                <table>
+                  <tr><td>カテゴリ</td><td>${data2.categoryProgram && data2.categoryProgram.selectedCategory ? 
+                    (data2.categoryProgram.selectedCategory === 'assault' ? '強襲' : 
+                     data2.categoryProgram.selectedCategory === 'general' ? '汎用' : 
+                     data2.categoryProgram.selectedCategory === 'support' ? '支援' : '未選択') : '未選択'}</td></tr>
+                  <tr><td>有利カテゴリへの与ダメ割合</td><td>${data2.categoryProgram ? data2.categoryProgram.damageRatio : 50}%</td></tr>
+                </table>
+              </div>
             </div>
           </div>
         </div>
@@ -4478,6 +4740,7 @@ function setupBidirectionalEnterNavigation() {
     'base_shooting', 'base_fighting', 'base_speed', 'base_dash',
     'base_thruster', 'base_turn', 'base_level',
     'slot_short', 'slot_middle', 'slot_long',
+    'category_damage_ratio',
     'shooting_ratio','fighting_ratio','ballistic_ratio','beam_ratio','melee_ratio'
   ];
 
