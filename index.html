@@ -1675,7 +1675,17 @@
         ],
         category: "defparts", useDefParts: true
       },
-
+      {
+        name: "レベルリンクシステム［装甲］",
+        type: "レベルリンクシステム",
+        slot: { short: 3, middle: 0, long: 3 },
+        levelEffects: {
+          base: { ballistic: 4, beam: 4, melee: 4 },
+          perLevel: { ballistic: 1, beam: 1, melee: 1 },
+          maxBonus: { ballistic: 8, beam: 8, melee: 8 }
+        },
+        category: "defparts", useDefParts: true
+      },
 
       //移動パーツ
 
@@ -4930,6 +4940,7 @@ window.addEventListener('resize', function() {
   </script>
 </body>
 </html>
+
 
 
 
