@@ -729,6 +729,9 @@
       color: #4CAF50;
     }
   </style>
+  <script 
+    src="https://www.paypal.com/sdk/js?client-id=BAAhlel4I_fvMULb6fZ0jQWiboOPDaTC2KfE1uindZyOezQwHwGC9DX8k66abSKZj1zThEcyc6AOpuv110&components=hosted-buttons&disable-funding=venmo&currency=JPY">
+  </script>
 </head>
 <body>
 <h1>バトオペ2 カスタムパーツ仮組みツール
@@ -882,15 +885,15 @@
             <div style="display: flex; gap: 8px; margin-top: 4px; flex-wrap: wrap;">
               <button type="button" id="category-assault" onclick="selectCategoryProgram('assault')" 
                       style="padding: 4px 12px; border: 1px solid #aaa; border-radius: 4px; background: #f0f0f0; cursor: pointer; min-width: 60px;">
-                強襲
+                強襲機
               </button>
               <button type="button" id="category-general" onclick="selectCategoryProgram('general')" 
                       style="padding: 4px 12px; border: 1px solid #aaa; border-radius: 4px; background: #f0f0f0; cursor: pointer; min-width: 60px;">
-                汎用
+                汎用機
               </button>
               <button type="button" id="category-support" onclick="selectCategoryProgram('support')" 
                       style="padding: 4px 12px; border: 1px solid #aaa; border-radius: 4px; background: #f0f0f0; cursor: pointer; min-width: 60px;">
-                支援
+                支援機  
               </button>
             </div>
           </div>
@@ -979,13 +982,25 @@
               <input type="number" id="fighting_ratio" value="50" min="0" style="width: 60px;">
             </label>
           </div>
-          <div class="power-index-display" style="padding: 12px; background: #fff; border: 1px solid #ddd; border-radius: 4px;">
+          <div class="power-index-display" style="padding: 12px; background: #fff; border: 1px solid #ddd; border-radius: 4px; display: flex; align-items: center; justify-content: space-between; gap: 16px;">
             <div style="font-weight: bold;">火力指数：<span id="power_index">0</span></div>
+            <div class="effective-stats" style="margin-top: 0; font-size: 13px; color: #333; display: flex; gap: 12px; align-items: baseline;">
+              <div>実質射撃補正：<span id="effective_shooting">0</span></div>
+              <div>実質格闘補正：<span id="effective_fighting">0</span></div>
+            </div>
           </div>
           <div class="power-buttons" style="margin-top: 8px;">
             <button id="maximize-power-btn" style="padding: 8px 16px; font-size: 14px; background: #4CAF50; color: white; border: none; border-radius: 4px; cursor: pointer; width: 100%;">
               火力指数最大化
             </button>
+            <div style="display:flex; gap: 8px; margin-top: 4px;">
+              <button id="maximize-shooting-btn" style="flex:1; padding: 8px 16px; font-size: 14px; background: #3F51B5; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                射撃最大化
+              </button>
+              <button id="maximize-fighting-btn" style="flex:1; padding: 8px 16px; font-size: 14px; background: #9C27B0; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                格闘最大化
+              </button>
+            </div>
             <button id="maximize-thruster-btn" style="margin-top: 4px; padding: 8px 16px; font-size: 14px; background: #FF9800; color: white; border: none; border-radius: 4px; cursor: pointer; width: 100%;">
               スラスター最大化
             </button>
@@ -1129,10 +1144,15 @@
       </ul>
       
       <h4>火力指数・耐久指数</h4>
-      <p><strong>火力指数</strong>：射撃・格闘の与ダメージ割合を設定して計算されます</p>
-      <p><strong>耐久指数</strong>：実弾・ビーム・格闘の被ダメージ割合を設定して計算されます</p>
+      <p><strong>火力指数</strong>：射撃・格闘の与ダメージ割合に応じて計算されます</p>
+      <p><strong>耐久指数</strong>：実弾・ビーム・格闘の被ダメージ割合に応じて計算されます</p>
       <p>「最大化」ボタンで自動的に最適なパーツを装備できます</p>
       <p>※拡張装甲で空きスロットが多いと、計算にかなり時間がかかります。</p>
+      
+      <h4>カテゴリ特攻プログラム設定</h4>
+      <p>機体カテゴリを選択すると、それ以外のカテゴリ特攻プログラムが自動装備されなくなります。</p>
+      <p>（例：汎用機を選択するとカテゴリ特攻強襲と支援が選ばれなくなる。）</p>
+      <p>有利カテゴリへの与ダメ割合は、カテゴリ特攻プログラムを装備した際の火力指数に影響します。</p>
       
       <h4>保存・読み込み機能</h4>
       <p>機体情報を保存して後で読み込むことができます。比較機能もあるよ</p>
@@ -1290,13 +1310,13 @@
     // パーツデータ
     const customParts = [
     // 攻撃パーツ
-      { name: "射撃強化プログラムLV1", shooting: 2, slot: { short: 0, middle: 0, long: 1 }, category: "attackparts" ,useAttackParts: true},
-      { name: "射撃強化プログラムLV2", shooting: 5, slot: { short: 0, middle: 0, long: 3 }, category: "attackparts" ,useAttackParts: true},
+      { name: "射撃強化プログラムLV1", shooting: 2, slot: { short: 0, middle: 0, long: 1 }, category: "attackparts" ,useAttackParts: true,useDefParts: true},
+      { name: "射撃強化プログラムLV2", shooting: 5, slot: { short: 0, middle: 0, long: 3 }, category: "attackparts" ,useAttackParts: true,useDefParts: true},
       { name: "射撃強化プログラムLV3", shooting: 7, slot: { short: 0, middle: 0, long: 4 }, category: "attackparts" ,useAttackParts: true},
       { name: "射撃強化プログラムLV4", shooting: 10, slot: { short: 0, middle: 2, long: 5 }, category: "attackparts" ,useAttackParts: true},
       { name: "射撃強化プログラムLV5", shooting: 13, slot: { short: 0, middle: 6, long: 10 }, category: "attackparts" ,useAttackParts: true},
-      { name: "格闘強化プログラムLV1", fighting: 2, slot: { short: 1, middle: 0, long: 0 }, category: "attackparts" ,useAttackParts: true},
-      { name: "格闘強化プログラムLV2", fighting: 5, slot: { short: 3, middle: 0, long: 0 }, category: "attackparts" ,useAttackParts: true},
+      { name: "格闘強化プログラムLV1", fighting: 2, slot: { short: 1, middle: 0, long: 0 }, category: "attackparts" ,useAttackParts: true,useDefParts: true},
+      { name: "格闘強化プログラムLV2", fighting: 5, slot: { short: 3, middle: 0, long: 0 }, category: "attackparts" ,useAttackParts: true,useDefParts: true},
       { name: "格闘強化プログラムLV3", fighting: 7, slot: { short: 4, middle: 0, long: 0 }, category: "attackparts" ,useAttackParts: true},
       { name: "格闘強化プログラムLV4", fighting: 10, slot: { short: 4, middle: 1, long: 0 }, category: "attackparts" ,useAttackParts: true},
       { name: "格闘強化プログラムLV5", fighting: 13, slot: { short: 5, middle: 3, long: 3 }, category: "attackparts" ,useAttackParts: true},
@@ -1369,7 +1389,15 @@
         slot: { short: 0, middle: 1, long: 2 },
         specialEffects: [
           { type: "status_duration", value: 10, text: "一部の状態異常の継続時間が%d%増加" }
-        ], category: "attackparts"
+        ], category: "attackparts",useDefParts: true
+      },
+      {
+        name: "試験型イレギュラーDBL",
+        slot: { short: 0, middle: 0, long: 0 },
+        specialEffects: [
+          { type: "status_duration", value: 10, text: "一部の状態異常の継続時間が%d%増加" },
+          { type: "status_recovery_increase", value: 10, text: "自機の一部の状態異常の復帰時間が%d%増加" }
+        ], category: "attackparts",useDefParts: true
       },
       {
         name: "特殊燃焼剤",
@@ -1377,7 +1405,7 @@
         specialEffects: [
           { type: "burn_damage", value: 20, text: "焼夷効果によって与えるダメージが%d%増加" },
           { type: "burn_duration", value: 10, text: "焼夷効果の継続時間が%d%増加" }
-        ], category: "attackparts"
+        ], category: "attackparts",useDefParts: true
       },
       {
         name: "火器管制最適化システム",
@@ -3323,6 +3351,19 @@
       // 火力指数の表示を更新
       document.getElementById('power_index').textContent = powerIndex.toFixed(1);
 
+      // 実質補正の計算と表示
+      // 実質射撃補正 = total.shooting * (1 + (shootingDamageBonus + shootingDamageOvertune) * (1 + categoryAdvantageBonus * categoryDamageRatio))
+      // 実質格闘補正 = total.fighting * (1 + (meleeDamageBonus + meleeDamageOvertune) * (1 + categoryAdvantageBonus * categoryDamageRatio))
+      const damageBuffMultiplierShooting = 1 + (shootingDamageBonus + shootingDamageOvertune) / 100;
+      const damageBuffMultiplierMelee = 1 + (meleeDamageBonus + meleeDamageOvertune) / 100;
+      const categoryBuffMultiplier = 1 + (categoryAdvantageBonus * categoryDamageRatio);
+      const effectiveShooting = total.shooting * (damageBuffMultiplierShooting * categoryBuffMultiplier);
+      const effectiveFighting = total.fighting * (damageBuffMultiplierMelee * categoryBuffMultiplier);
+      const effShootingEl = document.getElementById('effective_shooting');
+      const effFightingEl = document.getElementById('effective_fighting');
+      if (effShootingEl) effShootingEl.textContent = Math.round(effectiveShooting).toString();
+      if (effFightingEl) effFightingEl.textContent = Math.round(effectiveFighting).toString();
+
       // 耐久指数の計算
       const ballisticRatio = getNum('ballistic_ratio') ;
       const beamRatio = getNum('beam_ratio') ;
@@ -3710,7 +3751,7 @@ function maximizeThruster() {
     // カテゴリ特攻プログラムの与ダメ割合変更時にステータス更新
     document.getElementById('category_damage_ratio').addEventListener('input', updateStatus);
 // 軽量な火力指数計算関数
-function calculatePowerIndexFast(testEquipped) {
+function calculatePowerIndexFast(testEquipped, overrideRatios) {
   const getNum = id => Number(document.getElementById(id).value) || 0;
   const base = {
     shooting: getNum('base_shooting'),
@@ -3846,8 +3887,8 @@ function calculatePowerIndexFast(testEquipped) {
   meleeDamageOvertune = Math.min(meleeDamageOvertune, 12);
 
   // 火力指数計算
-  const shootingRatio = getNum('shooting_ratio') ;
-  const fightingRatio = getNum('fighting_ratio') ;
+  const shootingRatio = (overrideRatios && typeof overrideRatios.shooting === 'number') ? overrideRatios.shooting : getNum('shooting_ratio') ;
+  const fightingRatio = (overrideRatios && typeof overrideRatios.fighting === 'number') ? overrideRatios.fighting : getNum('fighting_ratio') ;
   const totalRatio = shootingRatio + fightingRatio;
   const normalizationFactor = totalRatio > 0 ? 1 / totalRatio : 0;
 
@@ -3874,7 +3915,7 @@ function calculatePowerIndexFast(testEquipped) {
   return powerIndex;
 }
 
-function maximizePowerIndex() {
+function maximizePowerIndex(overrideRatios) {
   const currentEquipped = [...equipped];
   
   const attackParts = customParts.filter(part => {
@@ -3905,12 +3946,12 @@ function maximizePowerIndex() {
   const slotLong = Number(document.getElementById('slot_long').value) || 0;
 
   let bestCombination = [...currentEquipped];
-  let maxPowerIndex = calculatePowerIndexFast(currentEquipped); // 初期値を軽量計算で取得
+  let maxPowerIndex = calculatePowerIndexFast(currentEquipped, overrideRatios); // 初期値を軽量計算で取得
   let minSlotUsage = Infinity;
 
   function findBestCombination(currentParts, currentIndex, currentUsed, usedTypes, usedNames) {
     // 軽量な火力指数計算を使用
-    const currentPowerIndex = calculatePowerIndexFast(currentParts);
+    const currentPowerIndex = calculatePowerIndexFast(currentParts, overrideRatios);
     const currentSlotUsage = currentUsed.short + currentUsed.middle + currentUsed.long;
     
     if (currentPowerIndex > maxPowerIndex || 
@@ -4124,6 +4165,14 @@ function maximizeDurabilityIndex() {
 
     // 火力指数最大化ボタンのイベントリスナーを設定
     document.getElementById('maximize-power-btn').addEventListener('click', maximizePowerIndex);
+    document.getElementById('maximize-shooting-btn').addEventListener('click', function () {
+      // 入力欄は変更せず、内部計算のみ格闘=0で最適化
+      maximizePowerIndex({ shooting: Number(document.getElementById('shooting_ratio').value) || 100, fighting: 0 });
+    });
+    document.getElementById('maximize-fighting-btn').addEventListener('click', function () {
+      // 入力欄は変更せず、内部計算のみ射撃=0で最適化
+      maximizePowerIndex({ shooting: 0, fighting: Number(document.getElementById('fighting_ratio').value) || 100 });
+    });
 
     // 耐久指数最大化ボタンのイベントリスナーを設定
     document.getElementById('maximize-durability-btn').addEventListener('click', maximizeDurabilityIndex);
@@ -4934,10 +4983,14 @@ window.addEventListener('resize', function() {
 });
 
   </script>
-</body>
-</html>
 
-  </script>
+<div id="paypal-container-SXA5FA2RRXZ7Y"></div>
+<script>
+  paypal.HostedButtons({
+    hostedButtonId: "SXA5FA2RRXZ7Y",
+  }).render("#paypal-container-SXA5FA2RRXZ7Y")
+</script>
+
 </body>
 </html>
 
