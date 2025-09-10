@@ -3387,13 +3387,13 @@
       document.getElementById('power_index').textContent = powerIndex.toFixed(1);
 
       // 実質補正の計算と表示
-      // 実質射撃補正 = total.shooting * (1 + (shootingDamageBonus + shootingDamageOvertune) * (1 + categoryAdvantageBonus * categoryDamageRatio))
-      // 実質格闘補正 = total.fighting * (1 + (meleeDamageBonus + meleeDamageOvertune) * (1 + categoryAdvantageBonus * categoryDamageRatio))
+      // 実質射撃補正 = (total.shooting + 100) × (1 + (shootingDamageBonus + shootingDamageOvertune)/100) × (1 + categoryAdvantageBonus × categoryDamageRatio) - 100
+      // 実質格闘補正 = (total.fighting + 100) × (1 + (meleeDamageBonus + meleeDamageOvertune)/100) × (1 + categoryAdvantageBonus × categoryDamageRatio) - 100
       const damageBuffMultiplierShooting = 1 + (shootingDamageBonus + shootingDamageOvertune) / 100;
       const damageBuffMultiplierMelee = 1 + (meleeDamageBonus + meleeDamageOvertune) / 100;
       const categoryBuffMultiplier = 1 + (categoryAdvantageBonus * categoryDamageRatio);
-      const effectiveShooting = total.shooting * (damageBuffMultiplierShooting * categoryBuffMultiplier);
-      const effectiveFighting = total.fighting * (damageBuffMultiplierMelee * categoryBuffMultiplier);
+      const effectiveShooting = (total.shooting + 100) * (damageBuffMultiplierShooting * categoryBuffMultiplier) - 100;
+      const effectiveFighting = (total.fighting + 100) * (damageBuffMultiplierMelee * categoryBuffMultiplier) - 100;
       const effShootingEl = document.getElementById('effective_shooting');
       const effFightingEl = document.getElementById('effective_fighting');
       if (effShootingEl) effShootingEl.textContent = Math.round(effectiveShooting).toString();
