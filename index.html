@@ -913,6 +913,36 @@
           <div id="special-effects-list"></div>
         </div>
       </div>
+      <!-- その他詳細ボタン＆モーダル -->
+      <div class="status-section">
+        <button id="other-details-btn" type="button" style="padding: 6px 12px; border: 1px solid #aaa; border-radius: 4px; background: #f0f0f0; cursor: pointer;">その他詳細</button>
+      </div>
+      <div id="other-details-modal" style="display:none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); align-items: center; justify-content: center; z-index: 1000;">
+        <div style="background: #fff; width: min(520px, 92%); max-height: 80vh; overflow: auto; border-radius: 8px; box-shadow: 0 6px 24px rgba(0,0,0,0.25);">
+          <div style="display:flex; align-items:center; justify-content:space-between; padding: 12px 16px; border-bottom: 1px solid #e0e0e0;">
+            <h3 style="margin:0;">その他詳細</h3>
+            <button id="other-details-close" type="button" aria-label="閉じる" style="border:none; background:transparent; font-size:20px; cursor:pointer; line-height:1; padding:4px 8px;">×</button>
+          </div>
+          <div style="padding: 12px 16px;">
+            <div style="margin-bottom: 16px;">
+              <h4 style="margin: 0 0 8px;">冷却</h4>
+              <div style="border: 1px solid #ddd; border-radius: 6px; padding: 10px;">
+                <div style="display:flex; gap:8px; flex-wrap: wrap; margin-bottom: 8px;">
+                  <button type="button" id="cooling-none" data-mode="none" class="cooling-mode-btn" style="padding: 6px 10px; border: 1px solid #aaa; border-radius: 4px; background: #f0f0f0; cursor: pointer;">適正なし</button>
+                  <button type="button" id="cooling-ground" data-mode="ground" class="cooling-mode-btn" style="padding: 6px 10px; border: 1px solid #aaa; border-radius: 4px; background: #f0f0f0; cursor: pointer;">地上適正</button>
+                  <button type="button" id="cooling-shtiv" data-mode="shtiv" class="cooling-mode-btn" style="padding: 6px 10px; border: 1px solid #aaa; border-radius: 4px; background: #f0f0f0; cursor: pointer;">シュティブ/オバブ</button>
+                </div>
+                <div style="display:grid; grid-template-columns: 1fr auto; row-gap:6px; column-gap:10px; align-items:center;">
+                  <div>スラスター回復速度</div>
+                  <div><span id="thruster-recovery-value">-</span><span style="margin-left:4px;">/s</span></div>
+                  <div>オーバーヒート回復時間</div>
+                  <div><span id="overheat-recovery-seconds">-</span><span style="margin-left:4px;">秒</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- PC用：左パネル：カスタムパーツ一覧 -->
@@ -3181,6 +3211,11 @@
         effectTotals['melee_damage_overtune'].value = Math.min(effectTotals['melee_damage_overtune'].value, 12);
       }
 
+      // 冷却表示用に効果合計を共有
+      if (typeof __setLatestEffectTotals === 'function') {
+        __setLatestEffectTotals(effectTotals);
+      }
+
       // 射撃ダメージ増加効果を合計
       let totalShootingDamage = 0;
       if (effectTotals['shooting_damage']) {
@@ -4950,6 +4985,89 @@ window.addEventListener('load', function() {
   setupCategoryCollapse();
 });
 
+// その他詳細（モーダル）
+let coolingMode = 'none'; // 'none' | 'ground' | 'shtiv'
+
+function openOtherDetailsModal() {
+  const modal = document.getElementById('other-details-modal');
+  if (modal) modal.style.display = 'flex';
+}
+function closeOtherDetailsModal() {
+  const modal = document.getElementById('other-details-modal');
+  if (modal) modal.style.display = 'none';
+}
+
+function setCoolingMode(nextMode) {
+  coolingMode = nextMode;
+  // ボタンの見た目を更新
+  const buttons = document.querySelectorAll('.cooling-mode-btn');
+  buttons.forEach(btn => {
+    const isActive = btn.getAttribute('data-mode') === coolingMode;
+    btn.style.background = isActive ? '#1976d2' : '#f0f0f0';
+    btn.style.color = isActive ? '#fff' : '#000';
+    btn.style.borderColor = isActive ? '#1976d2' : '#aaa';
+  });
+  // 値再計算
+  updateCoolingValues();
+}
+
+function getOverheatBaseSeconds(mode) {
+  if (mode === 'ground') return 6.3;
+  if (mode === 'shtiv') return 21;
+  return 7; // none
+}
+
+function getEffectTotalValue(effectTotals, key) {
+  return effectTotals && effectTotals[key] ? (effectTotals[key].value || 0) : 0;
+}
+
+function updateCoolingValues() {
+  // effectTotals は updateStatus 内で計算しているので、直近の結果を参照できるように window に保持する
+  const effectTotals = window.__latestEffectTotals || {};
+  const thrusterRecoverySum = getEffectTotalValue(effectTotals, 'thruster_recovery');
+  const overheatSum = getEffectTotalValue(effectTotals, 'overheat');
+
+  const thrusterRecoveryPerSec = 5 * (1 + thrusterRecoverySum / 100);
+  const overheatBase = getOverheatBaseSeconds(coolingMode);
+  const overheatSeconds = overheatBase * (1 - overheatSum / 100);
+
+  const trEl = document.getElementById('thruster-recovery-value');
+  const ohEl = document.getElementById('overheat-recovery-seconds');
+  if (trEl) trEl.textContent = thrusterRecoveryPerSec.toFixed(2);
+  if (ohEl) ohEl.textContent = overheatSeconds.toFixed(2);
+}
+
+// モーダル初期化
+document.addEventListener('DOMContentLoaded', () => {
+  const openBtn = document.getElementById('other-details-btn');
+  const closeBtn = document.getElementById('other-details-close');
+  if (openBtn) openBtn.addEventListener('click', () => { openOtherDetailsModal(); updateCoolingValues(); });
+  if (closeBtn) closeBtn.addEventListener('click', closeOtherDetailsModal);
+  // 背景クリックで閉じる
+  const modal = document.getElementById('other-details-modal');
+  if (modal) {
+    modal.addEventListener('click', (e) => { if (e.target === modal) closeOtherDetailsModal(); });
+  }
+  // 冷却モードボタン
+  const noneBtn = document.getElementById('cooling-none');
+  const groundBtn = document.getElementById('cooling-ground');
+  const shtivBtn = document.getElementById('cooling-shtiv');
+  if (noneBtn) noneBtn.addEventListener('click', () => setCoolingMode('none'));
+  if (groundBtn) groundBtn.addEventListener('click', () => setCoolingMode('ground'));
+  if (shtivBtn) shtivBtn.addEventListener('click', () => setCoolingMode('shtiv'));
+  setCoolingMode('none');
+});
+
+// updateStatus からも呼ばれて最新の effectTotals を反映する
+function __setLatestEffectTotals(effectTotals) {
+  window.__latestEffectTotals = effectTotals;
+  // モーダルを開いている間は表示値を更新
+  const modal = document.getElementById('other-details-modal');
+  if (modal && modal.style.display !== 'none') {
+    updateCoolingValues();
+  }
+}
+
 // 画面サイズ変更時は状態を保持して高さのみ再計算
 let __lastResizeInnerWidth = window.innerWidth;
 function __recalcCategoryHeights() {
@@ -4993,7 +5111,6 @@ window.addEventListener('resize', function() {
 
 </body>
 </html>
-
 
 
 
