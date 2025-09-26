@@ -1445,6 +1445,15 @@
         category: "attackparts"
       },
       {
+        name: "コネクティングシステム［支援Ⅰ型］",
+        slot: { short: 1, middle: 5, long: 3 },
+        specialEffect: "ビーム射撃兵装で敵機に与えるダメージが5%増加。支援機の場合、ビーム射撃兵装の集束時間が10%短縮",
+        specialEffects: [
+          { type: "beam_overheat", value: 10, text: "武器のオーバーヒート時間 %d%短縮" }
+        ],
+        category: "attackparts", 
+      },
+      {
         name: "レべルリンクシステム［格闘］",
         type: "レベルリンクシステム",
         slot: { short: 3, middle: 1, long: 2 },
@@ -2520,20 +2529,20 @@
       }
     }
 
-        // 火器管制最適化システムと AD-ASL, 高精度集束リングの同時装備制限
+        // 火器管制最適化システムと AD-ASL, 高精度集束リング, コネクティングシステム［支援Ⅰ型］の同時装備制限
         if (part.name === "火器管制最適化システム" && 
-            equipped.some(e => e && (e.name.includes("AD-ASL") || e.name.includes("高精度集束リング")))) {
+            equipped.some(e => e && (e.name.includes("AD-ASL") || e.name.includes("高精度集束リング") || e.name === "コネクティングシステム［支援Ⅰ型］"))) {
           if (!equipped.includes(part)) {
             const btn = document.createElement('button');
             btn.className = 'part-btn';
             btn.textContent = part.name;
             btn.disabled = true;
-            btn.title = "AD-ASL及び高精度集束リングと同時装備できません";
+            btn.title = "AD-ASL・高精度集束リング・コネクティングシステム［支援Ⅰ型］と同時装備できません";
             getCategoryList(part.category).appendChild(btn);
             return;
           }
         }
-        if ((part.name.includes("AD-ASL") || part.name.includes("高精度集束リング")) && 
+        if ((part.name.includes("AD-ASL") || part.name.includes("高精度集束リング") || part.name === "コネクティングシステム［支援Ⅰ型］") && 
             equipped.some(e => e && e.name === "火器管制最適化システム")) {
           if (!equipped.includes(part)) {
             const btn = document.createElement('button');
@@ -2546,6 +2555,31 @@
           }
         }
 
+        // コネクティングシステム［支援Ⅰ型］と大容量補給パック・火器管制最適化システムの同時装備制限
+        if (part.name === "コネクティングシステム［支援Ⅰ型］" && 
+            equipped.some(e => e && (e.name === "大容量補給パック" || e.name === "火器管制最適化システム"))) {
+          if (!equipped.includes(part)) {
+            const btn = document.createElement('button');
+            btn.className = 'part-btn';
+            btn.textContent = part.name;
+            btn.disabled = true;
+            btn.title = "大容量補給パック・火器管制最適化システムと同時装備できません";
+            getCategoryList(part.category).appendChild(btn);
+            return;
+          }
+        }
+        if ((part.name === "大容量補給パック" || part.name === "火器管制最適化システム") && 
+            equipped.some(e => e && e.name === "コネクティングシステム［支援Ⅰ型］")) {
+          if (!equipped.includes(part)) {
+            const btn = document.createElement('button');
+            btn.className = 'part-btn';
+            btn.textContent = part.name;
+            btn.disabled = true;
+            btn.title = "コネクティングシステム［支援Ⅰ型］と同時装備できません";
+            getCategoryList(part.category).appendChild(btn);
+            return;
+          }
+        }
         const btn = document.createElement('button');
         btn.className = 'part-btn';
         btn.textContent = part.name;
@@ -5111,6 +5145,7 @@ window.addEventListener('resize', function() {
 
 </body>
 </html>
+
 
 
 
