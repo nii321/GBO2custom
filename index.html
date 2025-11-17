@@ -1446,6 +1446,7 @@
       },
       {
         name: "コネクティングシステム［支援Ⅰ型］",
+        type: "コネクティングシステム",
         slot: { short: 1, middle: 5, long: 3 },
         specialEffect: "ビーム射撃兵装で敵機に与えるダメージが5%増加。支援機の場合、ビーム射撃兵装の集束時間が10%短縮",
         specialEffects: [
@@ -2380,6 +2381,15 @@
     specialEffect: "汎用機のみ装備可能。強襲機へのダメージを130%から140%に",
     category: "specialparts", useDefParts: true,useAttackParts: true
   },
+  {
+    name: "コネクティングシステム［強襲Ⅰ型］",
+    slot: { short: 9, middle: 3, long: 2 },
+    melee: 10,
+    fighting: 10,
+    type: "コネクティングシステム",
+    specialEffect: "強襲機に装備させると、スピードが7増加。",
+    category: "specialparts"
+  },
     ];
 
     let equipped = Array(8).fill(null);
@@ -2580,6 +2590,31 @@
             return;
           }
         }
+        // コネクティングシステム［強襲Ⅰ型］とスピード系の相互排他
+        if (part.name === "コネクティングシステム［強襲Ⅰ型］" &&
+            equipped.some(e => e && e.type === "スピード")) {
+          if (!equipped.includes(part)) {
+            const btn = document.createElement('button');
+            btn.className = 'part-btn';
+            btn.textContent = part.name;
+            btn.disabled = true;
+            btn.title = "スピード系パーツと同時装備できません";
+            getCategoryList(part.category).appendChild(btn);
+            return;
+          }
+        }
+        if (part.type === "スピード" &&
+            equipped.some(e => e && e.name === "コネクティングシステム［強襲Ⅰ型］")) {
+          if (!equipped.includes(part)) {
+            const btn = document.createElement('button');
+            btn.className = 'part-btn';
+            btn.textContent = part.name;
+            btn.disabled = true;
+            btn.title = "コネクティングシステム［強襲Ⅰ型］と同時装備できません";
+            getCategoryList(part.category).appendChild(btn);
+            return;
+          }
+        }
         const btn = document.createElement('button');
         btn.className = 'part-btn';
         btn.textContent = part.name;
@@ -2627,7 +2662,9 @@
               equipped.filter(e => e).length < 8 &&
               !(part.type && equipped.some(e => e && e.type === part.type)) &&
               !(part.type === "補給パック" && equipped.some(e => e && (e.name.includes("クイックローダー") || e.name.includes("補助ジェネレーター")))) &&
-              !((part.name.includes("クイックローダー") || part.name.includes("補助ジェネレーター")) && equipped.some(e => e && e.type === "補給パック"));
+              !((part.name.includes("クイックローダー") || part.name.includes("補助ジェネレーター")) && equipped.some(e => e && e.type === "補給パック")) &&
+              !(part.name === "コネクティングシステム［強襲Ⅰ型］" && equipped.some(e => e && e.type === "スピード")) &&
+              !(part.type === "スピード" && equipped.some(e => e && e.name === "コネクティングシステム［強襲Ⅰ型］"));
             
             if (canEquip) {
               const emptyIdx = equipped.findIndex(e => e === null);
@@ -2877,7 +2914,9 @@
         (used.long + selectedPart.slot.long <= slotLong) &&
         !equipped.includes(selectedPart) &&
         equipped.filter(e => e).length < 8 &&
-        !(selectedPart.type && equipped.some(e => e && e.type === selectedPart.type)); // 同じtypeのパーツが装備されていないことを確認
+        !(selectedPart.type && equipped.some(e => e && e.type === selectedPart.type)) && // 同じtypeのパーツが装備されていないことを確認
+        !(selectedPart.name === "コネクティングシステム［強襲Ⅰ型］" && equipped.some(e => e && e.type === "スピード")) &&
+        !(selectedPart.type === "スピード" && equipped.some(e => e && e.name === "コネクティングシステム［強襲Ⅰ型］"));
       if (!canEquip) return;
       const emptyIdx = equipped.findIndex(e => e === null);
       if (emptyIdx !== -1) {
