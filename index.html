@@ -1178,7 +1178,8 @@
       <p><strong>耐久指数</strong>：実弾・ビーム・格闘の被ダメージ割合に応じて計算されます</p>
       <p>「最大化」ボタンで自動的に最適なパーツを装備できます</p>
       <p>※拡張装甲で空きスロットが多いと、計算にかなり時間がかかります。</p>
-      
+      <p>※数値が同じになる場合は、合計使用スロットが少ない組み合わせが選ばれます。</p>
+
       <h4>カテゴリ特攻プログラム設定</h4>
       <p>機体カテゴリを選択すると、それ以外のカテゴリ特攻プログラムが自動装備されなくなります。</p>
       <p>（例：汎用機を選択するとカテゴリ特攻強襲と支援が選ばれなくなる。）</p>
@@ -1190,7 +1191,7 @@
 
       
       <h4>更新履歴・その他</h4>
-      <p>最終更新: 2025年9月26日</p>
+      <p>最終更新: 2025年12月4日</p>
       <p>スマホでも使いやすくなりました</p>
       <p>不具合報告や要望は、XのDMまで@8LpdFhYmxHfrOV9</p>
     </div>
@@ -1433,7 +1434,7 @@
         name: "特殊燃焼剤",
         slot: { short: 0, middle: 2, long: 2 },
         specialEffects: [
-          { type: "burn_damage", value: 20, text: "焼夷効果によって与えるダメージが%d%増加" },
+          { type: "burn_damage", value: 25, text: "焼夷効果によって与えるダメージが%d%増加" },
           { type: "burn_duration", value: 10, text: "焼夷効果の継続時間が%d%増加" }
         ], category: "attackparts",useDefParts: true
       },
@@ -1442,7 +1443,8 @@
         slot: { short: 3, middle: 1, long: 5 },
         shooting: 2,
         specialEffect: "ASL（自動照準補正）領域を5拡張。ビーム射撃兵装の集束時間を5%短縮し、更に敵へ与えるダメージを5%増加させる。(火力指数非対応)",
-        category: "attackparts"
+        category: "attackparts",
+        conflictTags: ["asl", "focus"]
       },
       {
         name: "コネクティングシステム［支援Ⅰ型］",
@@ -1453,9 +1455,10 @@
           { type: "beam_overheat", value: 10, text: "武器のオーバーヒート時間 %d%短縮" }
         ],
         category: "attackparts", 
+        effectTags: ["focus", "overheat"]
       },
       {
-        name: "レべルリンクシステム［格闘］",
+        name: "レベルリンクシステム［格闘］",
         type: "レベルリンクシステム",
         slot: { short: 3, middle: 1, long: 2 },
         levelEffects: {
@@ -1544,17 +1547,17 @@
           { type: "shield_hp", value: 1600, text: "シールドHPが%d増加" }
         ]
       },
-      { name: "対実弾装甲 LV1",   ballistic: 3, slot: { short: 0, middle: 1, long: 1 }, category: "defparts" ,useDefParts: true},
+      { name: "耐実弾装甲 LV1",   ballistic: 3, slot: { short: 0, middle: 1, long: 1 }, category: "defparts" ,useDefParts: true},
       { name: "耐実弾装甲 LV2",   ballistic: 6, slot: { short: 0, middle: 2, long: 3 }, category: "defparts" ,useDefParts: true},
       { name: "耐実弾装甲 LV3",   ballistic: 10, slot: { short: 0, middle: 0, long: 8 }, category: "defparts" ,useDefParts: true},
       { name: "耐実弾装甲 LV4",   ballistic: 15, slot: { short: 0, middle: 9, long: 0 }, category: "defparts" ,useDefParts: true},
       { name: "耐実弾装甲 LV5",   ballistic: 20, slot: { short: 0, middle: 9, long: 3 }, category: "defparts" ,useDefParts: true},
-      { name: "対ビーム装甲 LV1",  beam: 3, slot: { short: 0, middle: 1, long: 1 }, category: "defparts" ,useDefParts: true},
+      { name: "耐ビーム装甲 LV1",  beam: 3, slot: { short: 0, middle: 1, long: 1 }, category: "defparts" ,useDefParts: true},
       { name: "耐ビーム装甲 LV2",  beam: 6, slot: { short: 0, middle: 2, long: 3 }, category: "defparts" ,useDefParts: true},
       { name: "耐ビーム装甲 LV3",  beam: 10, slot: { short: 0, middle: 0, long: 8 }, category: "defparts" ,useDefParts: true},
       { name: "耐ビーム装甲 LV4",  beam: 15, slot: { short: 0, middle: 12, long: 0 }, category: "defparts" ,useDefParts: true},
       { name: "耐ビーム装甲 LV5",  beam: 20, slot: { short: 0, middle: 12, long: 4 }, category: "defparts" ,useDefParts: true},
-      { name: "対格闘装甲 LV1",  melee: 3, slot: { short: 1, middle: 1, long: 0 }, category: "defparts" ,useDefParts: true},
+      { name: "耐格闘装甲 LV1",  melee: 3, slot: { short: 1, middle: 1, long: 0 }, category: "defparts" ,useDefParts: true},
       { name: "耐格闘装甲 LV2",  melee: 6, slot: { short: 3, middle: 2, long: 0 }, category: "defparts" ,useDefParts: true},
       { name: "耐格闘装甲 LV3",  melee: 10, slot: { short: 0, middle: 8, long: 0 }, category: "defparts" ,useDefParts: true},
       { name: "耐格闘装甲 LV4",  melee: 15, slot: { short: 12, middle: 0, long: 0 }, category: "defparts" ,useDefParts: true},
@@ -1761,7 +1764,9 @@
         name: "高性能走行制御機構 LV1",
         slot: { short: 4, middle: 1, long: 0 },
         speed: 5,
-        category: "moveparts" ,type:"スピード", useAttackParts: true
+        category: "moveparts", useAttackParts: true,
+        effectTags: ["speed"],
+        conflictTags: ["speed"]
       },
       {
         name: "噴射制御装置 LV1",
@@ -1831,7 +1836,9 @@
         specialEffects: [
           { type: "leg_recovery", value: 20, text: "脚部負荷発生後の回復速度が%d%上昇" }
         ],
-        category: "moveparts"　,type:"スピード"
+        category: "moveparts",
+        effectTags: ["speed", "turn"],
+        conflictTags: ["speed", "turn"]
       },
       {
         name: "燃焼効率補助装置 LV1",
@@ -1849,7 +1856,9 @@
         specialEffects: [
           { type: "leg_burden", value: 20, text: "ジャンプ後と高速移動後の脚部負荷を%d%軽減" }
         ],
-        category: "moveparts" ,type:"スピード"
+        category: "moveparts",
+        effectTags: ["speed", "turn"],
+        conflictTags: ["speed", "turn"]
       },
       {
         name: "高純度推進材 LV1",
@@ -1861,6 +1870,18 @@
         ],
         category: "moveparts"
       },
+        {
+    name: "コネクティングシステム［汎用Ⅰ型］",
+    slot: { short: 0, middle: 4, long: 3 },
+    speed: 7,
+    thruster: 7,
+    turn: 7,
+    type: "コネクティングシステム",
+    specialEffect: "汎用機に装備させると、各部位へ与える部位ダメージが10%増加。",
+    category: "moveparts",
+    effectTags: ["speed"],
+    conflictTags: ["speed"]
+  },
       //輔助パーツ
 
 
@@ -1956,7 +1977,8 @@
         specialEffects: [
           { type: "reload_time", value: 3, text: "リロード時間 %d%短縮" }
         ],
-        category: "auxiliaryparts", useDefParts: true
+        category: "auxiliaryparts", useDefParts: true,
+        effectTags: ["reload"]
       },
       {
         name: "クイックローダー LV2",
@@ -1964,7 +1986,8 @@
         specialEffects: [
           { type: "reload_time", value: 6, text: "リロード時間 %d%短縮" }
         ],
-        category: "auxiliaryparts", useDefParts: true
+        category: "auxiliaryparts", useDefParts: true,
+        effectTags: ["reload"]
       },
       {
         name: "クイックローダー LV3",
@@ -1972,7 +1995,8 @@
         specialEffects: [
           { type: "reload_time", value: 10, text: "リロード時間 %d%短縮" }
         ],
-        category: "auxiliaryparts"
+        category: "auxiliaryparts",
+        effectTags: ["reload"]
       },
       {
         name: "クイックローダー LV4",
@@ -1980,7 +2004,8 @@
         specialEffects: [
           { type: "reload_time", value: 15, text: "リロード時間 %d%短縮" }
         ],
-        category: "auxiliaryparts"
+        category: "auxiliaryparts",
+        effectTags: ["reload"]
       },
       {
         name: "補助ジェネレーター LV1",
@@ -1988,7 +2013,8 @@
         specialEffects: [
           { type: "beam_overheat", value: 3, text: "武器のオーバーヒート時間 %d%短縮" }
         ],
-        category: "auxiliaryparts", useDefParts: true
+        category: "auxiliaryparts", useDefParts: true,
+        effectTags: ["overheat"]
       },
       {
         name: "補助ジェネレーター LV2",
@@ -1996,7 +2022,8 @@
         specialEffects: [
           { type: "beam_overheat", value: 6, text: "武器のオーバーヒート時間 %d%短縮" }
         ],
-        category: "auxiliaryparts", useDefParts: true
+        category: "auxiliaryparts", useDefParts: true,
+        effectTags: ["overheat"]
       },
       {
         name: "補助ジェネレーター LV3",
@@ -2004,7 +2031,8 @@
         specialEffects: [
           { type: "beam_overheat", value: 10, text: "武器のオーバーヒート時間 %d%短縮" }
         ],
-        category: "auxiliaryparts"
+        category: "auxiliaryparts",
+        effectTags: ["overheat"]
       },
       {
         name: "補助ジェネレーター LV4",
@@ -2012,7 +2040,8 @@
         specialEffects: [
           { type: "beam_overheat", value: 15, text: "武器のオーバーヒート時間 %d%短縮" }
         ],
-        category: "auxiliaryparts"
+        category: "auxiliaryparts",
+        effectTags: ["overheat"]
       },
       {
         name: "補助ジェネレーター LV5",
@@ -2020,7 +2049,8 @@
         specialEffects: [
           { type: "beam_overheat", value: 20, text: "武器のオーバーヒート時間 %d%短縮" }
         ],
-        category: "auxiliaryparts"
+        category: "auxiliaryparts",
+        effectTags: ["overheat"]
       },
       {
         name: "高精度集束リング LV1",
@@ -2028,7 +2058,8 @@
         specialEffects: [
           { type: "beam_focus", value: 3, text: "ビーム射撃兵装の集束時間が%d%短縮" }
         ],
-        category: "auxiliaryparts", useDefParts: true
+        category: "auxiliaryparts", useDefParts: true,
+        effectTags: ["focus"]
       },
       {
         name: "高精度集束リング LV2",
@@ -2036,7 +2067,8 @@
         specialEffects: [
           { type: "beam_focus", value: 6, text: "ビーム射撃兵装の集束時間が%d%短縮" }
         ],
-        category: "auxiliaryparts", useDefParts: true
+        category: "auxiliaryparts", useDefParts: true,
+        effectTags: ["focus"]
       },
       {
         name: "高精度集束リング LV3",
@@ -2044,7 +2076,8 @@
         specialEffects: [
           { type: "beam_focus", value: 10, text: "ビーム射撃兵装の集束時間が%d%短縮" }
         ],
-        category: "auxiliaryparts", useDefParts: true
+        category: "auxiliaryparts", useDefParts: true,
+        effectTags: ["focus"]
       },
 
 
@@ -2068,19 +2101,22 @@
         name: "フィールドモーター LV1",
         slot: { short: 0, middle: 1, long: 4 },
         turn: 5,
-        category: "auxiliaryparts", useDefParts: true
+        category: "auxiliaryparts", useDefParts: true,
+        effectTags: ["turn"]
       },
       {
         name: "フィールドモーター LV2",
         slot: { short: 0, middle: 3, long: 7 },
         turn: 10,
-        category: "auxiliaryparts"
+        category: "auxiliaryparts",
+        effectTags: ["turn"]
       },
       {
         name: "フィールドモーター LV3",
         slot: { short: 6, middle: 4, long: 1 },
         turn: 15,
-        category: "auxiliaryparts"
+        category: "auxiliaryparts",
+        effectTags: ["turn"]
       },
 
       {
@@ -2089,7 +2125,8 @@
         specialEffects: [
           { type: "asl_range", value: 5, text: "ASL領域を%d拡張" }
         ],
-        category: "auxiliaryparts", useDefParts: true
+        category: "auxiliaryparts", useDefParts: true,
+        effectTags: ["asl"]
       },
       {
         name: "AD-ASL LV2",
@@ -2097,7 +2134,8 @@
         specialEffects: [
           { type: "asl_range", value: 10, text: "ASL領域を%d拡張" }
         ],
-        category: "auxiliaryparts"
+        category: "auxiliaryparts",
+        effectTags: ["asl"]
       },
       {
         name: "電子防護システム",
@@ -2115,7 +2153,8 @@
           { type: "reload_time", value: 15, text: "リロード時間 %d%短縮" },
           { type: "beam_overheat", value: 15, text: "武器のオーバーヒート時間 %d%短縮" }
         ],
-        category: "auxiliaryparts"
+        category: "auxiliaryparts",
+        conflictTags: ["reload", "overheat"]
       },
 
       //特殊パーツ
@@ -2261,7 +2300,8 @@
           { type: "ballistic_reduction", value: 3, text: "実弾被ダメージを%d%軽減" },
           { type: "beam_reduction", value: 3, text: "ビーム被ダメージを%d%軽減" },
           { type: "melee_reduction", value: 3, text: "格闘被ダメージを%d%軽減" }
-        ], category: "specialparts" ,useDefParts: true
+        ], category: "specialparts" ,useDefParts: true,
+        effectTags: ["turn"]
       },      
 
       {
@@ -2334,7 +2374,8 @@
       perLevel: { fighting: 1, melee: 1, dash: 1, thruster: 1, turn: 1 },
       maxBonus: { fighting: 5, melee: 5, dash: 5, thruster: 5, turn: 5 }
     },
-    category: "specialparts"
+        category: "specialparts",
+        effectTags: ["turn"]
   },
       {
         name: "特殊強化装置［Type-α］",
@@ -2388,14 +2429,87 @@
     fighting: 10,
     type: "コネクティングシステム",
     specialEffect: "強襲機に装備させると、スピードが7増加。",
-    category: "specialparts"
+    category: "specialparts",
+    effectTags: ["speed"]
   },
+
     ];
 
     let equipped = Array(8).fill(null);
     let selectedPart = null;
     let selectedExpansionSkill = EXPANSION_SKILL_GROUPS[0].levels[0];
     let lastSelectedLevelName = "Lv1"; // 直前に選択していたレベル名を記憶
+
+    const EFFECT_LABELS = {
+      reload: "リロード短縮効果",
+      overheat: "武器OH短縮効果",
+      asl: "ASL拡張効果",
+      focus: "集束時間短縮効果",
+      speed: "スピード上昇効果",
+      turn: "旋回性能上昇効果"
+    };
+
+    function getEquipRestriction(part, parts, options = {}) {
+      if (!part || !Array.isArray(parts)) return null;
+      const ignoreSelf = options.ignoreSelf === true;
+      const comparable = parts.filter(p => p && (!ignoreSelf || p !== part));
+
+      // 1. type による排他チェック
+      if (part.type) {
+        const conflict = comparable.find(p => p.type === part.type);
+        if (conflict) {
+          return { reason: 'type', conflictPart: conflict, typeName: part.type };
+        }
+      }
+
+      // 2. conflictTags と effectTags による排他チェック（双方向）
+      for (const existing of comparable) {
+        // パターン1: 新しいパーツの conflictTags が、既存パーツの effectTags と重複
+        if (part.conflictTags && existing.effectTags) {
+          const conflict = part.conflictTags.find(tag => existing.effectTags.includes(tag));
+          if (conflict) {
+            return { reason: 'conflict', conflictPart: existing, effectTag: conflict };
+          }
+        }
+        
+        // パターン2: 既存パーツの conflictTags が、新しいパーツの effectTags と重複
+        if (existing.conflictTags && part.effectTags) {
+          const conflict = existing.conflictTags.find(tag => part.effectTags.includes(tag));
+          if (conflict) {
+            return { reason: 'conflict', conflictPart: existing, effectTag: conflict };
+          }
+        }
+      }
+
+      return null;
+    }
+
+    function getRestrictionMessage(restriction, part) {
+      if (!restriction) return "";
+      if (restriction.reason === 'type') {
+        const typeName = restriction.typeName || (part && part.type) || '同系統';
+        return `${typeName}系パーツは複数装備できません`;
+      }
+      if (restriction.reason === 'conflict' || restriction.reason === 'exclusiveEffect') {
+        const label = EFFECT_LABELS[restriction.effectTag] || '同じ効果';
+        const conflictName = restriction.conflictPart && restriction.conflictPart.name ? restriction.conflictPart.name : '同効果パーツ';
+        return `${conflictName}と${label}が重複するため同時装備できません`;
+      }
+      return "同時装備できません";
+    }
+
+    function collectEffectTags(parts) {
+      const effectSet = new Set();
+      if (!Array.isArray(parts)) return effectSet;
+      parts.forEach(part => {
+        if (!part) return; // null チェック
+        // effectTags を収集（conflictTags によるチェック用）
+        if (part.effectTags && Array.isArray(part.effectTags)) {
+          part.effectTags.forEach(effect => effectSet.add(effect));
+        }
+      });
+      return effectSet;
+    }
 
     // --- 強化段階取得 ---
     function getEnhanceStage() {
@@ -2473,147 +2587,15 @@
       document.getElementById('parts-list-special').innerHTML = '';
 
       customParts.forEach((part) => {
-        // 同じtypeのパーツが既に装備されている場合は装備不可
-        if (part.type && equipped.some(e => e && e.type === part.type)) {
-          // 既に装備中の場合のみ解除可
-          if (!equipped.includes(part)) {
+        const restriction = getEquipRestriction(part, equipped, { ignoreSelf: true });
+        if (restriction && !equipped.includes(part)) {
             const btn = document.createElement('button');
             btn.className = 'part-btn';
             btn.textContent = part.name;
             btn.disabled = true;
-            btn.title = `${part.type}系パーツは複数装備できません`;
+          btn.title = getRestrictionMessage(restriction, part);
             getCategoryList(part.category).appendChild(btn);
             return;
-          }
-        }
-
-        // 補給パックとクイックローダー/補助ジェネレーターの同時装備制限
-        if (part.type === "補給パック" && equipped.some(e => e && (e.name.includes("クイックローダー") || e.name.includes("補助ジェネレーター")))) {
-          if (!equipped.includes(part)) {
-            const btn = document.createElement('button');
-            btn.className = 'part-btn';
-            btn.textContent = part.name;
-            btn.disabled = true;
-            btn.title = "クイックローダーまたは補助ジェネレーターと同時装備できません";
-            getCategoryList(part.category).appendChild(btn);
-            return;
-          }
-        }
-        if ((part.name.includes("クイックローダー") || part.name.includes("補助ジェネレーター")) && 
-            equipped.some(e => e && e.type === "補給パック")) {
-          if (!equipped.includes(part)) {
-            const btn = document.createElement('button');
-            btn.className = 'part-btn';
-            btn.textContent = part.name;
-            btn.disabled = true;
-            btn.title = "大容量補給パックと同時装備できません";
-            getCategoryList(part.category).appendChild(btn);
-            return;
-          }
-        }
-            // 運動性能強化機構LV1とコンポジットモーターLV1の同時装備制限
-    if ((part.name === "運動性能強化機構 LV1" || part.name === "コンポジットモーター LV1") && 
-        equipped.some(e => e && (e.name === "フィールドモーター LV1" || e.name === "フィールドモーター LV2" || e.name === "フィールドモーター LV3" || 
-                                e.name === "サイコフレーム" || e.name === "総合強化プログラム［格闘］LV1"))) {
-      if (!equipped.includes(part)) {
-        const btn = document.createElement('button');
-        btn.className = 'part-btn';
-        btn.textContent = part.name;
-        btn.disabled = true;
-        btn.title = "フィールドモーター、サイコフレーム、総合強化プログラム［格闘］LV1と同時装備できません";
-        getCategoryList(part.category).appendChild(btn);
-        return;
-      }
-    }
-    if ((part.name === "フィールドモーター LV1" || part.name === "フィールドモーター LV2" || part.name === "フィールドモーター LV3" || 
-         part.name === "サイコフレーム" || part.name === "総合強化プログラム［格闘］LV1") && 
-        equipped.some(e => e && (e.name === "運動性能強化機構 LV1" || e.name === "コンポジットモーター LV1"))) {
-      if (!equipped.includes(part)) {
-        const btn = document.createElement('button');
-        btn.className = 'part-btn';
-        btn.textContent = part.name;
-        btn.disabled = true;
-        btn.title = "運動性能強化機構LV1またはコンポジットモーターLV1と同時装備できません";
-        getCategoryList(part.category).appendChild(btn);
-        return;
-      }
-    }
-
-        // 火器管制最適化システムと AD-ASL, 高精度集束リング, コネクティングシステム［支援Ⅰ型］の同時装備制限
-        if (part.name === "火器管制最適化システム" && 
-            equipped.some(e => e && (e.name.includes("AD-ASL") || e.name.includes("高精度集束リング") || e.name === "コネクティングシステム［支援Ⅰ型］"))) {
-          if (!equipped.includes(part)) {
-            const btn = document.createElement('button');
-            btn.className = 'part-btn';
-            btn.textContent = part.name;
-            btn.disabled = true;
-            btn.title = "AD-ASL・高精度集束リング・コネクティングシステム［支援Ⅰ型］と同時装備できません";
-            getCategoryList(part.category).appendChild(btn);
-            return;
-          }
-        }
-        if ((part.name.includes("AD-ASL") || part.name.includes("高精度集束リング") || part.name === "コネクティングシステム［支援Ⅰ型］") && 
-            equipped.some(e => e && e.name === "火器管制最適化システム")) {
-          if (!equipped.includes(part)) {
-            const btn = document.createElement('button');
-            btn.className = 'part-btn';
-            btn.textContent = part.name;
-            btn.disabled = true;
-            btn.title = "火器管制最適化システムと同時装備できません";
-            getCategoryList(part.category).appendChild(btn);
-            return;
-          }
-        }
-
-        // コネクティングシステム［支援Ⅰ型］と大容量補給パック・火器管制最適化システムの同時装備制限
-        if (part.name === "コネクティングシステム［支援Ⅰ型］" && 
-            equipped.some(e => e && (e.name === "大容量補給パック" || e.name === "火器管制最適化システム"))) {
-          if (!equipped.includes(part)) {
-            const btn = document.createElement('button');
-            btn.className = 'part-btn';
-            btn.textContent = part.name;
-            btn.disabled = true;
-            btn.title = "大容量補給パック・火器管制最適化システムと同時装備できません";
-            getCategoryList(part.category).appendChild(btn);
-            return;
-          }
-        }
-        if ((part.name === "大容量補給パック" || part.name === "火器管制最適化システム") && 
-            equipped.some(e => e && e.name === "コネクティングシステム［支援Ⅰ型］")) {
-          if (!equipped.includes(part)) {
-            const btn = document.createElement('button');
-            btn.className = 'part-btn';
-            btn.textContent = part.name;
-            btn.disabled = true;
-            btn.title = "コネクティングシステム［支援Ⅰ型］と同時装備できません";
-            getCategoryList(part.category).appendChild(btn);
-            return;
-          }
-        }
-        // コネクティングシステム［強襲Ⅰ型］とスピード系の相互排他
-        if (part.name === "コネクティングシステム［強襲Ⅰ型］" &&
-            equipped.some(e => e && e.type === "スピード")) {
-          if (!equipped.includes(part)) {
-            const btn = document.createElement('button');
-            btn.className = 'part-btn';
-            btn.textContent = part.name;
-            btn.disabled = true;
-            btn.title = "スピード系パーツと同時装備できません";
-            getCategoryList(part.category).appendChild(btn);
-            return;
-          }
-        }
-        if (part.type === "スピード" &&
-            equipped.some(e => e && e.name === "コネクティングシステム［強襲Ⅰ型］")) {
-          if (!equipped.includes(part)) {
-            const btn = document.createElement('button');
-            btn.className = 'part-btn';
-            btn.textContent = part.name;
-            btn.disabled = true;
-            btn.title = "コネクティングシステム［強襲Ⅰ型］と同時装備できません";
-            getCategoryList(part.category).appendChild(btn);
-            return;
-          }
         }
         const btn = document.createElement('button');
         btn.className = 'part-btn';
@@ -2657,14 +2639,11 @@
           // 装備処理関数
           const equipPart = () => {
             if (!canEquipSlots) return;
+            const restrictionForEquip = getEquipRestriction(part, equipped);
             let canEquip =
               !equipped.includes(part) &&
               equipped.filter(e => e).length < 8 &&
-              !(part.type && equipped.some(e => e && e.type === part.type)) &&
-              !(part.type === "補給パック" && equipped.some(e => e && (e.name.includes("クイックローダー") || e.name.includes("補助ジェネレーター")))) &&
-              !((part.name.includes("クイックローダー") || part.name.includes("補助ジェネレーター")) && equipped.some(e => e && e.type === "補給パック")) &&
-              !(part.name === "コネクティングシステム［強襲Ⅰ型］" && equipped.some(e => e && e.type === "スピード")) &&
-              !(part.type === "スピード" && equipped.some(e => e && e.name === "コネクティングシステム［強襲Ⅰ型］"));
+              !restrictionForEquip;
             
             if (canEquip) {
               const emptyIdx = equipped.findIndex(e => e === null);
@@ -2880,18 +2859,18 @@
       const slotMiddle = Number(document.getElementById('slot_middle').value) || 0;
       const slotLong = Number(document.getElementById('slot_long').value) || 0;
       const used = getUsedSlots();
+      const restriction = getEquipRestriction(part, equipped);
       let canEquip =
         (used.short + part.slot.short <= slotShort) &&
         (used.middle + part.slot.middle <= slotMiddle) &&
         (used.long + part.slot.long <= slotLong) &&
         !equipped.includes(part) &&
         equipped.filter(e => e).length < 8 &&
-        !(part.type && equipped.some(e => e && e.type === part.type)) &&
-        // 補給パックとクイックローダー/補助ジェネレーターの同時装備制限をチェック
-        !(part.type === "補給パック" && equipped.some(e => e && (e.name.includes("クイックローダー") || e.name.includes("補助ジェネレーター")))) &&
-        !((part.name.includes("クイックローダー") || part.name.includes("補助ジェネレーター")) && equipped.some(e => e && e.type === "補給パック"));
+        !restriction;
 
-      document.getElementById('equip-btn').disabled = !canEquip;
+      const modalEquipBtn = document.getElementById('equip-btn');
+      modalEquipBtn.disabled = !canEquip;
+      modalEquipBtn.title = !canEquip && restriction ? getRestrictionMessage(restriction, part) : '';
       document.getElementById('part-modal').style.display = 'block';
     }
 
@@ -2914,9 +2893,7 @@
         (used.long + selectedPart.slot.long <= slotLong) &&
         !equipped.includes(selectedPart) &&
         equipped.filter(e => e).length < 8 &&
-        !(selectedPart.type && equipped.some(e => e && e.type === selectedPart.type)) && // 同じtypeのパーツが装備されていないことを確認
-        !(selectedPart.name === "コネクティングシステム［強襲Ⅰ型］" && equipped.some(e => e && e.type === "スピード")) &&
-        !(selectedPart.type === "スピード" && equipped.some(e => e && e.name === "コネクティングシステム［強襲Ⅰ型］"));
+        !getEquipRestriction(selectedPart, equipped);
       if (!canEquip) return;
       const emptyIdx = equipped.findIndex(e => e === null);
       if (emptyIdx !== -1) {
@@ -3751,7 +3728,7 @@ function maximizeThruster() {
   let maxThruster = calculateThrusterFast(currentEquipped);
   let minSlotUsage = Infinity;
 
-  function findBestCombination(currentParts, currentIndex, currentUsed, usedTypes, usedNames) {
+  function findBestCombination(currentParts, currentIndex, currentUsed, usedTypes, usedNames, usedEffects) {
     const currentThruster = calculateThrusterFast(currentParts);
     const currentSlotUsage = currentUsed.short + currentUsed.middle + currentUsed.long;
     
@@ -3775,6 +3752,9 @@ function maximizeThruster() {
 
         if (part.type && usedTypes.has(part.type)) continue;
         if (usedNames.has(part.name)) continue;
+        
+        // conflictTags チェック
+        if (part.conflictTags && part.conflictTags.some(tag => usedEffects.has(tag))) continue;
 
         const newUsed = {
           short: currentUsed.short + part.slot.short,
@@ -3791,8 +3771,13 @@ function maximizeThruster() {
           const newNames = new Set(usedNames);
           if (part.type) newTypes.add(part.type);
           newNames.add(part.name);
+          const newEffects = new Set(usedEffects);
+          // effectTags を追加
+          if (part.effectTags) {
+            part.effectTags.forEach(effect => newEffects.add(effect));
+          }
           
-          findBestCombination(newParts, i + 1, newUsed, newTypes, newNames);
+          findBestCombination(newParts, i + 1, newUsed, newTypes, newNames, newEffects);
         }
       }
     }
@@ -3808,7 +3793,8 @@ function maximizeThruster() {
     }
   });
 
-  findBestCombination([...currentEquipped], 0, used, initialTypes, initialNames);
+  const initialEffects = collectEffectTags(currentEquipped);
+  findBestCombination([...currentEquipped], 0, used, initialTypes, initialNames, initialEffects);
 
   // 最適な組み合わせを適用
   equipped = bestCombination;
@@ -4057,7 +4043,7 @@ function maximizePowerIndex(overrideRatios) {
   let maxPowerIndex = calculatePowerIndexFast(currentEquipped, overrideRatios); // 初期値を軽量計算で取得
   let minSlotUsage = Infinity;
 
-  function findBestCombination(currentParts, currentIndex, currentUsed, usedTypes, usedNames) {
+  function findBestCombination(currentParts, currentIndex, currentUsed, usedTypes, usedNames, usedEffects) {
     // 軽量な火力指数計算を使用
     const currentPowerIndex = calculatePowerIndexFast(currentParts, overrideRatios);
     const currentSlotUsage = currentUsed.short + currentUsed.middle + currentUsed.long;
@@ -4082,6 +4068,9 @@ function maximizePowerIndex(overrideRatios) {
 
         if (part.type && usedTypes.has(part.type)) continue;
         if (usedNames.has(part.name)) continue;
+        
+        // conflictTags チェック
+        if (part.conflictTags && part.conflictTags.some(tag => usedEffects.has(tag))) continue;
 
         const newUsed = {
           short: currentUsed.short + part.slot.short,
@@ -4099,8 +4088,13 @@ function maximizePowerIndex(overrideRatios) {
           const newNames = new Set(usedNames);
           if (part.type) newTypes.add(part.type);
           newNames.add(part.name);
+          const newEffects = new Set(usedEffects);
+          // effectTags を追加
+          if (part.effectTags) {
+            part.effectTags.forEach(effect => newEffects.add(effect));
+          }
           
-          findBestCombination(newParts, i + 1, newUsed, newTypes, newNames);
+          findBestCombination(newParts, i + 1, newUsed, newTypes, newNames, newEffects);
         }
       }
     }
@@ -4116,7 +4110,8 @@ function maximizePowerIndex(overrideRatios) {
     }
   });
 
-  findBestCombination([...currentEquipped], 0, used, initialTypes, initialNames);
+  const initialEffects = collectEffectTags(currentEquipped);
+  findBestCombination([...currentEquipped], 0, used, initialTypes, initialNames, initialEffects);
 
   // 最適な組み合わせを適用
   equipped = bestCombination;
@@ -4150,33 +4145,6 @@ function maximizeDurabilityIndex() {
         return false;
       }
     }
-        // カスタムパーツ拡張装甲が選択されている場合の追加条件
-    if (isCustomArmorSelected) {
-      // 補給パックが装備されているかをチェック
-      const hasSupplyPack = currentEquipped.some(equippedPart => 
-        equippedPart && equippedPart.name && equippedPart.name.includes("補給パック")
-      );
-      
-      if (hasSupplyPack) {
-        // 補給パックが装備されている場合、クイックローダーと補助ジェネレーターを除外
-        if (part.name.includes("クイックローダー") || part.name.includes("補助ジェネレーター")) {
-          return false;
-        }
-      }
-
-      // 火器管制最適化システムが装備されているかをチェック
-      const hasFireControlSystem = currentEquipped.some(equippedPart => 
-        equippedPart && equippedPart.name === "火器管制最適化システム"
-      );
-      
-      if (hasFireControlSystem) {
-        // 火器管制最適化システムが装備されている場合、AD-ASL及び高精度集束リングを除外
-        if (part.name.includes("AD-ASL") || part.name.includes("高精度集束リング")) {
-          return false;
-        }
-      }
-    }
-    
     // カテゴリ特攻プログラムのフィルタリング
     const selectedCategory = document.getElementById('selected_category').value;
     if (part.type === "カテゴリ特攻プログラム") {
@@ -4198,7 +4166,7 @@ function maximizeDurabilityIndex() {
   let maxDurabilityIndex = calculateDurabilityIndexFast(currentEquipped);
   let minSlotUsage = Infinity;
 
-  function findBestCombination(currentParts, currentIndex, currentUsed, usedTypes, usedNames) {
+  function findBestCombination(currentParts, currentIndex, currentUsed, usedTypes, usedNames, usedEffects) {
     // 空きスロットの合計を計算
     const remainingSlots = (slotShort - currentUsed.short) + (slotMiddle - currentUsed.middle) + (slotLong - currentUsed.long);
     
@@ -4228,6 +4196,9 @@ function maximizeDurabilityIndex() {
 
         if (part.type && usedTypes.has(part.type)) continue;
         if (usedNames.has(part.name)) continue;
+        
+        // conflictTags チェック
+        if (part.conflictTags && part.conflictTags.some(tag => usedEffects.has(tag))) continue;
 
         const newUsed = {
           short: currentUsed.short + part.slot.short,
@@ -4244,8 +4215,13 @@ function maximizeDurabilityIndex() {
           const newNames = new Set(usedNames);
           if (part.type) newTypes.add(part.type);
           newNames.add(part.name);
+          const newEffects = new Set(usedEffects);
+          // effectTags を追加
+          if (part.effectTags) {
+            part.effectTags.forEach(effect => newEffects.add(effect));
+          }
           
-          findBestCombination(newParts, i + 1, newUsed, newTypes, newNames);
+          findBestCombination(newParts, i + 1, newUsed, newTypes, newNames, newEffects);
         }
       }
     }
@@ -4261,7 +4237,8 @@ function maximizeDurabilityIndex() {
     }
   });
 
-  findBestCombination([...currentEquipped], 0, used, initialTypes, initialNames);
+  const initialEffects = collectEffectTags(currentEquipped);
+  findBestCombination([...currentEquipped], 0, used, initialTypes, initialNames, initialEffects);
 
   // 最適な組み合わせを適用
   equipped = bestCombination;
