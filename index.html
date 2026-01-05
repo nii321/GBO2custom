@@ -1190,7 +1190,7 @@
 
       
       <h4>更新履歴・その他</h4>
-      <p>最終更新: 2025年9月26日</p>
+      <p>最終更新: 2026年1月4日</p>
       <p>スマホでも使いやすくなりました</p>
       <p>不具合報告や要望は、XのDMまで@8LpdFhYmxHfrOV9</p>
     </div>
@@ -1768,7 +1768,18 @@
         ],
         category: "defparts", useDefParts: true
       },
-
+  {
+    name: "コネクティングシステム［汎用Ⅱ型］",
+    hp: 2000,
+    slot: { short: 0, middle: 6, long: 2 },
+    type: "コネクティングシステム",
+    specialEffects: [
+      { type: "shield_hp", value: 2000, text: "シールドHPが%d増加" }
+    ],
+    specialEffect: "汎用機の場合、各部位のHPが30%増加",
+    category: "defparts",
+    useDefParts: true
+  },
       //移動パーツ
 
       {
@@ -2388,6 +2399,16 @@
     },
     category: "specialparts",
     effectTags: ["turn_boost"]
+  },
+        {
+    name: "総合強化プログラム［射撃］LV1",
+    slot: { short: 1, middle: 3, long: 3 },
+    levelEffects: {
+      base: { hp: 100, ballistic: 1, beam: 1, shooting: 1 },
+      perLevel: { hp: 100, ballistic: 1, beam: 1, shooting: 1 },
+      maxBonus: { hp: 500, ballistic: 5, beam: 5, shooting: 5 }
+    },
+    category: "specialparts"
   },
       {
         name: "特殊強化装置［Type-α］",
