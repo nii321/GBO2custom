@@ -1797,6 +1797,18 @@
     category: "defparts",
     useDefParts: true
   },
+      {
+        name: "教育型コンピューター［特防］",
+        type: "教育型コンピューター",
+        slot: { short: 3, middle: 4, long: 3 },
+        specialEffects: [
+          { type: "ballistic_reduction", value: 11, text: "実弾被ダメージを%d%軽減" },
+          { type: "beam_reduction", value: 11, text: "ビーム被ダメージを%d%軽減" },
+          { type: "melee_reduction", value: 11, text: "格闘被ダメージを%d%軽減" }
+        ],
+        specialEffect: "試合経過4分後、自機がよろけている場合に受けるダメージを10％軽減。（この効果を加味して11%軽減にしています。）",
+        category: "defparts", useDefParts: true
+      },      
       //移動パーツ
 
       {
@@ -2369,18 +2381,7 @@
         ],
         category: "specialparts", useAttackParts: true
       },
-      {
-        name: "教育型コンピューター［特防］",
-        type: "教育型コンピューター",
-        slot: { short: 3, middle: 4, long: 3 },
-        specialEffects: [
-          { type: "ballistic_reduction", value: 11, text: "実弾被ダメージを%d%軽減" },
-          { type: "beam_reduction", value: 11, text: "ビーム被ダメージを%d%軽減" },
-          { type: "melee_reduction", value: 11, text: "格闘被ダメージを%d%軽減" }
-        ],
-        specialEffect: "試合経過4分後、自機がよろけている場合に受けるダメージを10％軽減。（この効果を加味して11%軽減にしています。）",
-        category: "specialparts", useDefParts: true
-      },
+
       { name: "複合フレーム［Type-A］LV1", 
       type: "複合フレーム", 
       slot: { short: 2, middle: 4, long: 3 },
